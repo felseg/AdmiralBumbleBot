@@ -17,12 +17,6 @@ pub struct Handler;
 impl EventHandler for Handler {
     fn message(&self, ctx: Context, msg: Message) {
         commands::execute(ctx, msg);
-        // if msg.content == "$buzz" {}
-        // if msg.content.starts_with("$help") {
-        //     if let Err(e) = msg.channel_id.say(&ctx.http, "no") {
-        //         println!("Error sending message: {:?}", e);
-        //     }
-        // }
     }
 
     fn message_update(
