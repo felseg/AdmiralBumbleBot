@@ -8,7 +8,7 @@ pub fn execute(ctx: Context, msg: Message) {
         return;
     }
 
-    let re = Regex::new(r"/(?<command>^\$\w+) (?<target><@\d+>) (?<rem>.*)/g").unwrap();
+    let re = Regex::new(r"(?P<command>^\$\w+)").unwrap();
     let caps = re.captures(msg.content.as_str()).unwrap();
 
     match &caps["command"] {
