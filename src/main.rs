@@ -4,6 +4,7 @@ use serenity::Client;
 
 mod commands;
 mod handler;
+mod logging;
 mod variables;
 
 const CACHE_SIZE: usize = 100;

@@ -1,5 +1,5 @@
 use crate::commands;
-use crate::variables::Variables;
+use crate::logging;
 
 use serenity::client::EventHandler;
 
@@ -27,8 +27,8 @@ impl EventHandler for Handler {
         _event: MessageUpdateEvent,
     ) {
         if let Some(msg) = old_if_available {
-            if let Err(e) = ChannelId(Variables::log_channel()).say(
-                ctx.http,
+            logging::log(
+                ctx,
                 format!(
                     "✏️ Message edited by `{}#{}` in <#{}>:\n` ┣ Original: {}`\n` ┗ Edited:   {}`",
                     msg.author.name,
@@ -36,25 +36,23 @@ impl EventHandler for Handler {
                     msg.channel_id,
                     msg.content,
                     new.unwrap().content
-                ),
-            ) {
-                eprintln!("Error sending message: {}", e);
-            }
+                )
+                .as_ref(),
+            );
         }
     }
 
     fn message_delete(&self, ctx: Context, channel_id: ChannelId, message_id: MessageId) {
         let deleted_message = ctx.cache.read().message(channel_id, message_id);
         if let Some(message) = deleted_message {
-            if let Err(e) = ChannelId(Variables::log_channel()).say(
-                ctx.http,
+            logging::log(
+                ctx,
                 format!(
                     "🗑 Message deleted in <#{}>: `{}#{}: {}`",
                     channel_id, message.author.name, message.author.discriminator, message.content
-                ),
-            ) {
-                eprintln!("Error sending message: {}", e);
-            }
+                )
+                .as_str(),
+            );
         }
     }
 }
