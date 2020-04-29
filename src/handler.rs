@@ -27,6 +27,12 @@ impl EventHandler for Handler {
         _event: MessageUpdateEvent,
     ) {
         if let Some(msg) = old_if_available {
+            let new_content = new.unwrap().content;
+            if msg.content == new_content {
+                //Embeds register as identical edits for some reason
+                return;
+            }
+
             logging::log(
                 ctx,
                 format!(
@@ -35,7 +41,7 @@ impl EventHandler for Handler {
                     msg.author.discriminator,
                     msg.channel_id,
                     msg.content,
-                    new.unwrap().content
+                    new_content
                 )
                 .as_ref(),
             );
