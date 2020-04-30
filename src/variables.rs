@@ -27,4 +27,11 @@ impl Variables {
             .parse()
             .expect("Error parsing Admin role ID")
     }
+
+    pub fn announcement_channel() -> u64 {
+        env::var("ABB_ANNOUNCE_CHANNEL")
+            .expect("Announcement channel not found")
+            .parse()
+            .expect("Error parsing announcement channel")
+    }
 }
