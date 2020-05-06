@@ -3,11 +3,14 @@ use crate::logging;
 
 use serenity::client::EventHandler;
 
+use crate::variables::Variables;
 use serenity::{
     model::{
         channel::Message,
         event::MessageUpdateEvent,
-        id::{ChannelId, MessageId},
+        guild::Member,
+        id::{ChannelId, GuildId, MessageId},
+        user::User,
     },
     prelude::*,
 };
@@ -55,6 +58,7 @@ impl EventHandler for Handler {
         let deleted_message = ctx.cache.read().message(channel_id, message_id);
         if let Some(message) = deleted_message {
             let stripped_message = &message.content.clone().replace("`", "");
+
             logging::log(
                 ctx,
                 format!(
@@ -64,5 +68,34 @@ impl EventHandler for Handler {
                 .as_str(),
             );
         }
+    }
+
+    fn guild_member_addition(&self, ctx: Context, _guild_id: GuildId, mut new_member: Member) {
+        let join_roles = vec![Variables::join_role_1(), Variables::join_role_2()];
+
+        new_member
+            .add_role(
+                &ctx.http,
+                join_roles[d20::roll_dice("1d2").unwrap().total as usize - 1],
+            )
+            .expect("Error roling new user");
+
+        logging::log(
+            ctx,
+            format!("📥 User joined: `{}`", new_member.distinct()).as_str(),
+        );
+    }
+
+    fn guild_member_removal(
+        &self,
+        ctx: Context,
+        _guild: GuildId,
+        user: User,
+        _member_data_if_available: Option<Member>,
+    ) {
+        logging::log(
+            ctx,
+            format!("📤 User left: `{}#{}`", user.name, user.discriminator).as_str(),
+        );
     }
 }

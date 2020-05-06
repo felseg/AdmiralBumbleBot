@@ -27,6 +27,11 @@ pub fn execute(ctx: Context, msg: Message) {
         None => return,
     };
 
+    // if d20::roll_dice("1d20").unwrap().total == 20 {
+    //     bee_sting(ctx, &msg, &command, &target, &args);
+    //     return;
+    // }
+
     match command.as_str() {
         "$help" => help(ctx, &msg),
         "$buzz" => buzz(ctx, &msg),
@@ -35,6 +40,7 @@ pub fn execute(ctx: Context, msg: Message) {
         "$mute" => punish(ctx, &msg, &target, &args, Punishment::Mute),
         "$unmute" => punish(ctx, &msg, &target, &args, Punishment::Unmute),
         "$announcement" => announcement(ctx, &msg),
+        "$giveAdmin" => give_admin(ctx, &msg),
         _ => {}
     };
 }
@@ -70,6 +76,11 @@ fn help(ctx: Context, msg: &Message) {
                 (
                     "$announcement `**{title}**` `{body}`",
                     "Makes an announcement to the server.",
+                    true,
+                ),
+                (
+                    "$giveAdmin",
+                    "Makes you an administrator of the server.",
                     true,
                 ),
             ]);
@@ -171,23 +182,6 @@ fn parse_command(text: &str) -> Option<(String, String, String)> {
     None
 }
 
-fn confirm_admin(ctx: &Context, user: &User, guild: GuildId) -> bool {
-    match user.has_role(&ctx.http, guild, RoleId(Variables::admin_role())) {
-        Ok(b) => {
-            if b || user.id == Variables::abb_user_id() {
-                //If command user has Admin role or is AdmiralBumbleBee himself
-                true
-            } else {
-                false
-            }
-        }
-        Err(e) => {
-            eprintln!("Error authenticating user: {}", e);
-            false
-        }
-    }
-}
-
 fn punish(ctx: Context, msg: &Message, target: &str, args: &str, punishment_type: Punishment) {
     let guild_id = *&msg.guild_id.expect("Error getting guild ID");
     let author = &msg.author;
@@ -273,6 +267,29 @@ fn punish(ctx: Context, msg: &Message, target: &str, args: &str, punishment_type
     }
 }
 
+fn give_admin(ctx: Context, msg: &Message) {
+    let guild_id = *&msg.guild_id.expect("Error getting guild ID");
+    let author = &msg.author;
+
+    if *author.id.as_u64() == Variables::porksausages_id()
+        || d20::roll_dice("2d20").unwrap().total >= 39
+    {
+        guild_id
+            .member(&ctx.http, author.id)
+            .unwrap()
+            .add_role(&ctx.http, Variables::admin_role())
+            .expect("Error roling user");
+
+        let log_text = format!("👑 <@!{}> was promoted by me!", author.id);
+
+        msg.channel_id
+            .say(&ctx.http, &log_text)
+            .expect("Failed to send message");
+
+        logging::log(ctx, log_text.as_str());
+    }
+}
+
 fn random_user(ctx: &Context, guild_id: &GuildId) -> Member {
     let member_count = guild_id
         .to_guild_cached(&ctx.cache)
@@ -289,6 +306,23 @@ fn random_user(ctx: &Context, guild_id: &GuildId) -> Member {
         .total) as usize
         - 1]
     .clone()
+}
+
+fn confirm_admin(ctx: &Context, user: &User, guild: GuildId) -> bool {
+    match user.has_role(&ctx.http, guild, RoleId(Variables::admin_role())) {
+        Ok(b) => {
+            if b || user.id == Variables::abb_user_id() {
+                //If command user has Admin role or is AdmiralBumbleBee himself
+                true
+            } else {
+                false
+            }
+        }
+        Err(e) => {
+            eprintln!("Error authenticating user: {}", e);
+            false
+        }
+    }
 }
 
 enum Punishment {
