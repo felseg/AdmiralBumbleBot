@@ -33,6 +33,9 @@ impl EventHandler for Handler {
                 return;
             }
 
+            let old_stripped = &msg.content.clone().replace("`", "");
+            let new_stripped = &new_content.replace("`", "");
+
             logging::log(
                 ctx,
                 format!(
@@ -40,8 +43,8 @@ impl EventHandler for Handler {
                     msg.author.name,
                     msg.author.discriminator,
                     msg.channel_id,
-                    msg.content,
-                    new_content
+                    old_stripped,
+                    new_stripped
                 )
                 .as_ref(),
             );
@@ -51,11 +54,12 @@ impl EventHandler for Handler {
     fn message_delete(&self, ctx: Context, channel_id: ChannelId, message_id: MessageId) {
         let deleted_message = ctx.cache.read().message(channel_id, message_id);
         if let Some(message) = deleted_message {
+            let stripped_message = &message.content.clone().replace("`", "");
             logging::log(
                 ctx,
                 format!(
                     "🗑 Message deleted in <#{}>: `{}#{}: {}`",
-                    channel_id, message.author.name, message.author.discriminator, message.content
+                    channel_id, message.author.name, message.author.discriminator, stripped_message
                 )
                 .as_str(),
             );
