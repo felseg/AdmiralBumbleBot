@@ -34,4 +34,11 @@ impl Variables {
             .parse()
             .expect("Error parsing announcement channel")
     }
+
+    pub fn mute_role() -> u64 {
+        env::var("ABB_MUTE_ROLE")
+            .expect("Mute role not found")
+            .parse()
+            .expect("Error parsing mute role")
+    }
 }

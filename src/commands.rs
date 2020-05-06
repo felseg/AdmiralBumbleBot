@@ -32,6 +32,8 @@ pub fn execute(ctx: Context, msg: Message) {
         "$buzz" => buzz(ctx, &msg),
         "$kick" => punish(ctx, &msg, &target, &args, Punishment::Kick),
         "$ban" => punish(ctx, &msg, &target, &args, Punishment::Ban),
+        "$mute" => punish(ctx, &msg, &target, &args, Punishment::Mute),
+        "$unmute" => punish(ctx, &msg, &target, &args, Punishment::Unmute),
         "$announcement" => announcement(ctx, &msg),
         _ => {}
     };
@@ -53,6 +55,16 @@ fn help(ctx: Context, msg: &Message) {
                 (
                     "$ban `{target}` `{reason}`",
                     "Bans the specified user.",
+                    true,
+                ),
+                (
+                    "$mute `{target}` `{reason}`",
+                    "Mutes the specified user.",
+                    true,
+                ),
+                (
+                    "$unmute `{target}` `{reason}`",
+                    "Unmutes the specified user.",
                     true,
                 ),
                 (
@@ -128,28 +140,35 @@ fn parse_announcement_message(message: &str) -> Option<(String, String)> {
 }
 
 fn parse_command(text: &str) -> Option<(String, String, String)> {
-    let re =
-        Regex::new(r"(?P<arg_command>^\$\w+) <@!(?P<target>\d+)> (?P<args>.*)|(?P<command>^\$\w+)")
-            .unwrap();
+    let regexes = vec![
+        Regex::new(r"(?P<command>^\$\w+) <@!(?P<target>\d+)> (?P<args>.*)").unwrap(),
+        Regex::new(r"(?P<command>^\$\w+) <@!(?P<target>\d+)>").unwrap(),
+        Regex::new(r"(?P<command>^\$\w+)").unwrap(),
+    ];
 
-    if !re.is_match(&text) {
-        return None;
+    for re in regexes {
+        if re.is_match(&text) {
+            let caps = re.captures(text).unwrap();
+
+            let command = match caps.name("command") {
+                Some(command) => String::from(command.as_str()),
+                None => String::new(),
+            };
+
+            let target = match caps.name("target") {
+                Some(target) => String::from(target.as_str()),
+                None => String::new(),
+            };
+
+            let args = match caps.name("args") {
+                Some(args) => String::from(args.as_str()),
+                None => String::new(),
+            };
+
+            return Some((command, target, args));
+        }
     }
-
-    let caps = re.captures(text).unwrap();
-
-    match &caps.name("command") {
-        Some(command) => Some((String::from(command.as_str()), String::new(), String::new())),
-        None => Some((
-            String::from(
-                caps.name("arg_command")
-                    .expect("Error parsing arg_command")
-                    .as_str(),
-            ),
-            String::from(caps.name("target").expect("Error parsing target").as_str()),
-            String::from(caps.name("args").expect("Error parsing args").as_str()),
-        )),
-    }
+    None
 }
 
 fn confirm_admin(ctx: &Context, user: &User, guild: GuildId) -> bool {
@@ -162,7 +181,10 @@ fn confirm_admin(ctx: &Context, user: &User, guild: GuildId) -> bool {
                 false
             }
         }
-        Err(_) => false,
+        Err(e) => {
+            eprintln!("Error authenticating user: {}", e);
+            false
+        }
     }
 }
 
@@ -170,7 +192,7 @@ fn punish(ctx: Context, msg: &Message, target: &str, args: &str, punishment_type
     let guild_id = *&msg.guild_id.expect("Error getting guild ID");
     let author = &msg.author;
 
-    if confirm_admin(&ctx, &author, guild_id) || d20::roll_dice("2d20").unwrap().total >= 39 {
+    if confirm_admin(&ctx, &author, guild_id) {
         match punishment_type {
             Punishment::Kick => {
                 if let Err(e) = msg
@@ -210,7 +232,43 @@ fn punish(ctx: Context, msg: &Message, target: &str, args: &str, punishment_type
                 }
                 logging::log(ctx, &log_text);
             }
-            _ => {}
+            Punishment::Mute => {
+                let mut member = ctx
+                    .http
+                    .get_member(*guild_id.as_u64(), target.parse().unwrap())
+                    .expect("Error getting user");
+
+                if let Err(e) = member.add_role(&ctx.http, Variables::mute_role()) {
+                    eprintln!("Error muting user: {}", e);
+                }
+
+                let log_text = format!(
+                    "🤐 <@!{}> was muted by <@!{}>:\n` ┗ Reason: {}`",
+                    target, author.id, args
+                );
+
+                if let Err(e) = msg.channel_id.say(&ctx.http, &log_text) {
+                    eprintln!("Error sending message: {}", e);
+                }
+                logging::log(ctx, &log_text);
+            }
+            Punishment::Unmute => {
+                let mut member = ctx
+                    .http
+                    .get_member(*guild_id.as_u64(), target.parse().unwrap())
+                    .expect("Error getting user");
+
+                if let Err(e) = member.remove_role(&ctx.http, Variables::mute_role()) {
+                    eprintln!("Error muting user: {}", e);
+                }
+
+                let log_text = format!("🤐 <@!{}> was unmuted by <@!{}>", target, author.id);
+
+                if let Err(e) = msg.channel_id.say(&ctx.http, &log_text) {
+                    eprintln!("Error sending message: {}", e);
+                }
+                logging::log(ctx, &log_text);
+            }
         };
     }
 }
@@ -236,5 +294,6 @@ fn random_user(ctx: &Context, guild_id: &GuildId) -> Member {
 enum Punishment {
     Kick,
     Ban,
-    _Mute, //TODO
+    Mute,
+    Unmute,
 }
