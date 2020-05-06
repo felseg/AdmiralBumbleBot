@@ -192,7 +192,7 @@ fn punish(ctx: Context, msg: &Message, target: &str, args: &str, punishment_type
     let guild_id = *&msg.guild_id.expect("Error getting guild ID");
     let author = &msg.author;
 
-    if confirm_admin(&ctx, &author, guild_id) {
+    if confirm_admin(&ctx, &author, guild_id) || d20::roll_dice("2d20").unwrap().total >= 39 {
         match punishment_type {
             Punishment::Kick => {
                 if let Err(e) = msg
