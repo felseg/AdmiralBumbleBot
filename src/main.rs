@@ -1,5 +1,6 @@
 use {handler::Handler, variables::Variables};
 
+use dotenv::dotenv;
 use serenity::Client;
 
 mod commands;
@@ -10,6 +11,8 @@ mod variables;
 const CACHE_SIZE: usize = 100;
 
 fn main() {
+    dotenv().ok();
+
     let mut client = Client::new(Variables::token(), Handler).expect("Error creating client");
 
     {
