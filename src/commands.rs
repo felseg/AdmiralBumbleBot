@@ -1,6 +1,5 @@
 use {
     crate::logging,
-    crate::variables::Variables,
     d20,
     regex::Regex,
     serenity::{
@@ -111,17 +110,19 @@ fn announcement(ctx: Context, msg: &Message) {
 
     if confirm_admin(&ctx, &author, guild_id) || d20::roll_dice("2d20").unwrap().total >= 39 {
         /* Obnoxious embed with random ping */
-        if let Err(e) = ChannelId(Variables::announcement_channel()).send_message(&ctx.http, |m| {
-            m.tts(true);
-            m.content(format!("Hey, <@!{}>! Yes, you!", random_user.user_id()));
-            m.embed(|e| {
-                e.title(title);
-                e.description(body);
-                e.color(Color::from_rgb(255, 255, 0));
-                e
-            });
-            m
-        }) {
+        if let Err(e) =
+            ChannelId(get_env!("ABB_ANNOUNCEMENT_CHANNEL", u64)).send_message(&ctx.http, |m| {
+                m.tts(true);
+                m.content(format!("Hey, <@!{}>! Yes, you!", random_user.user_id()));
+                m.embed(|e| {
+                    e.title(title);
+                    e.description(body);
+                    e.color(Color::from_rgb(255, 255, 0));
+                    e
+                });
+                m
+            })
+        {
             eprintln!("Error sending announcement: {}", e);
         }
     }
@@ -232,7 +233,7 @@ fn punish(ctx: Context, msg: &Message, target: &str, args: &str, punishment_type
                     .get_member(*guild_id.as_u64(), target.parse().unwrap())
                     .expect("Error getting user");
 
-                if let Err(e) = member.add_role(&ctx.http, Variables::mute_role()) {
+                if let Err(e) = member.add_role(&ctx.http, get_env!("ABB_MUTE_ROLE", u64)) {
                     eprintln!("Error muting user: {}", e);
                 }
 
@@ -252,7 +253,7 @@ fn punish(ctx: Context, msg: &Message, target: &str, args: &str, punishment_type
                     .get_member(*guild_id.as_u64(), target.parse().unwrap())
                     .expect("Error getting user");
 
-                if let Err(e) = member.remove_role(&ctx.http, Variables::mute_role()) {
+                if let Err(e) = member.remove_role(&ctx.http, get_env!("ABB_MUTE_ROLE", u64)) {
                     eprintln!("Error muting user: {}", e);
                 }
 
@@ -271,13 +272,13 @@ fn give_admin(ctx: Context, msg: &Message) {
     let guild_id = *&msg.guild_id.expect("Error getting guild ID");
     let author = &msg.author;
 
-    if *author.id.as_u64() == Variables::porksausages_id()
+    if *author.id.as_u64() == get_env!("ABB_PORKSAUSAGES_ID", u64)
         || d20::roll_dice("2d20").unwrap().total >= 39
     {
         guild_id
             .member(&ctx.http, author.id)
             .unwrap()
-            .add_role(&ctx.http, Variables::admin_role())
+            .add_role(&ctx.http, get_env!("ABB_ADMIN_ROLE", u64))
             .expect("Error roling user");
 
         let log_text = format!("👑 <@!{}> was promoted by me!", author.id);
@@ -309,9 +310,9 @@ fn random_user(ctx: &Context, guild_id: &GuildId) -> Member {
 }
 
 fn confirm_admin(ctx: &Context, user: &User, guild: GuildId) -> bool {
-    match user.has_role(&ctx.http, guild, RoleId(Variables::admin_role())) {
+    match user.has_role(&ctx.http, guild, RoleId(get_env!("ABB_ADMIN_ROLE", u64))) {
         Ok(b) => {
-            if b || user.id == Variables::abb_user_id() {
+            if b || user.id == get_env!("ABB_USER_ID", u64) {
                 //If command user has Admin role or is AdmiralBumbleBee himself
                 true
             } else {

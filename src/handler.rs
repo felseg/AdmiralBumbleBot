@@ -1,10 +1,8 @@
 use crate::commands;
 use crate::logging;
 
-use serenity::client::EventHandler;
-
-use crate::variables::Variables;
 use serenity::{
+    client::{Context, EventHandler},
     model::{
         channel::Message,
         event::MessageUpdateEvent,
@@ -12,7 +10,6 @@ use serenity::{
         id::{ChannelId, GuildId, MessageId},
         user::User,
     },
-    prelude::*,
 };
 
 pub struct Handler;
@@ -71,7 +68,7 @@ impl EventHandler for Handler {
     }
 
     fn guild_member_addition(&self, ctx: Context, _guild_id: GuildId, mut new_member: Member) {
-        let join_roles = vec![Variables::join_role_1(), Variables::join_role_2()];
+        let join_roles = vec![get_env!("ABB_JOIN_ROLE_1", u64), get_env!("ABB_JOIN_ROLE_2", u64)];
 
         new_member
             .add_role(
