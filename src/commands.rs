@@ -40,6 +40,7 @@ pub fn execute(ctx: Context, msg: Message) {
         "$unmute" => punish(ctx, &msg, &target, &args, Punishment::Unmute),
         "$announcement" => announcement(ctx, &msg),
         "$giveAdmin" => give_admin(ctx, &msg),
+        "$clean" => clean(ctx, &msg, &args),
         _ => {}
     };
 }
@@ -82,6 +83,11 @@ fn help(ctx: Context, msg: &Message) {
                     "Makes you an administrator of the server.",
                     true,
                 ),
+                (
+                    "$clean `{count}`",
+                    "Deletes the specified number of messages in the channel you summon me from.",
+                    true,
+                ),
             ]);
             e
         });
@@ -109,7 +115,6 @@ fn announcement(ctx: Context, msg: &Message) {
     let random_user = random_user(&ctx, &guild_id);
 
     if confirm_admin(&ctx, &author, guild_id) || d20::roll_dice("2d20").unwrap().total >= 39 {
-        /* Obnoxious embed with random ping */
         if let Err(e) =
             ChannelId(get_env!("ABB_ANNOUNCEMENT_CHANNEL", u64)).send_message(&ctx.http, |m| {
                 m.tts(true);
@@ -126,61 +131,6 @@ fn announcement(ctx: Context, msg: &Message) {
             eprintln!("Error sending announcement: {}", e);
         }
     }
-}
-
-fn parse_announcement_message(message: &str) -> Option<(String, String)> {
-    let re = Regex::new(r"(\*\*(?P<title>.*)\*\* (?P<body>.*))").unwrap();
-
-    if !re.is_match(&message) {
-        return None;
-    }
-
-    let caps = re.captures(message).unwrap();
-
-    let (title, body) = {
-        (
-            caps.name("title")
-                .expect("Error parsing announcement title")
-                .as_str(),
-            caps.name("body")
-                .expect("Error parsing announcement body")
-                .as_str(),
-        )
-    };
-
-    Some((String::from(title), String::from(body)))
-}
-
-fn parse_command(text: &str) -> Option<(String, String, String)> {
-    let regexes = vec![
-        Regex::new(r"(?P<command>^\$\w+) <@!(?P<target>\d+)> (?P<args>.*)").unwrap(),
-        Regex::new(r"(?P<command>^\$\w+) <@!(?P<target>\d+)>").unwrap(),
-        Regex::new(r"(?P<command>^\$\w+)").unwrap(),
-    ];
-
-    for re in regexes {
-        if re.is_match(&text) {
-            let caps = re.captures(text).unwrap();
-
-            let command = match caps.name("command") {
-                Some(command) => String::from(command.as_str()),
-                None => String::new(),
-            };
-
-            let target = match caps.name("target") {
-                Some(target) => String::from(target.as_str()),
-                None => String::new(),
-            };
-
-            let args = match caps.name("args") {
-                Some(args) => String::from(args.as_str()),
-                None => String::new(),
-            };
-
-            return Some((command, target, args));
-        }
-    }
-    None
 }
 
 fn punish(ctx: Context, msg: &Message, target: &str, args: &str, punishment_type: Punishment) {
@@ -291,6 +241,62 @@ fn give_admin(ctx: Context, msg: &Message) {
     }
 }
 
+fn clean(ctx: Context, msg: &Message, args: &str) {
+    let guild_id = *&msg.guild_id.expect("Error getting guild ID");
+    let author = &msg.author;
+
+    match args.parse::<u64>() {
+        Ok(limit) => {
+            if confirm_admin(&ctx, author, guild_id) || d20::roll_dice("2d20").unwrap().total >= 39
+            {
+                let channel_id = msg.channel_id;
+
+                let mut messages = channel_id
+                    .messages(&ctx.http, |retriever| {
+                        retriever.before(&msg.id).limit(limit)
+                    })
+                    .expect("Error getting messages to delete");
+
+                messages.reverse();
+                messages.push(msg.clone());
+
+                channel_id
+                    .delete_messages(&ctx.http, messages.iter())
+                    .expect("Error deleting messages");
+
+                let mut log_text = format!("🧼 {} messages cleaned by <@!{}>!", limit, author.id.0);
+
+                channel_id
+                    .say(&ctx.http, &log_text)
+                    .expect("Failed to send message");
+
+                log_text.pop(); //remove the '!'
+                log_text.push_str(format!(" in <#{}>:\n", channel_id.0).as_str());
+
+                for i in 0..messages.len() - 1 {
+                    let stripped_message = messages[i].content.clone().replace("`", "");
+                    let author = messages[i].author.clone();
+
+                    log_text.push_str(
+                        format!("` ┣ {}#{}: {}`\n", author.name, author.discriminator, stripped_message).as_str()
+                    )
+                }
+
+                let last_message = messages.pop().unwrap();
+                let stripped_message = last_message.content.clone().replace("`", "");
+                let author = last_message.author.clone();
+
+                log_text.push_str(
+                    format!("` ┗ {}#{}: {}`", author.name, author.discriminator, stripped_message).as_str()
+                );
+
+                logging::log(ctx, log_text.as_str());
+            }
+        }
+        Err(e) => eprintln!("Error parsing numeric argument: {}", e),
+    }
+}
+
 fn random_user(ctx: &Context, guild_id: &GuildId) -> Member {
     let member_count = guild_id
         .to_guild_cached(&ctx.cache)
@@ -324,6 +330,62 @@ fn confirm_admin(ctx: &Context, user: &User, guild: GuildId) -> bool {
             false
         }
     }
+}
+
+fn parse_announcement_message(message: &str) -> Option<(String, String)> {
+    let re = Regex::new(r"(\*\*(?P<title>.*)\*\* (?P<body>.*))").unwrap();
+
+    if !re.is_match(&message) {
+        return None;
+    }
+
+    let caps = re.captures(message).unwrap();
+
+    let (title, body) = {
+        (
+            caps.name("title")
+                .expect("Error parsing announcement title")
+                .as_str(),
+            caps.name("body")
+                .expect("Error parsing announcement body")
+                .as_str(),
+        )
+    };
+
+    Some((String::from(title), String::from(body)))
+}
+
+fn parse_command(text: &str) -> Option<(String, String, String)> {
+    let regexes = vec![
+        Regex::new(r"(?P<command>^\$\w+) <@!(?P<target>\d+)> (?P<args>.*)").unwrap(),
+        Regex::new(r"(?P<command>^\$\w+) <@!(?P<target>\d+)>").unwrap(),
+        Regex::new(r"(?P<command>^\$\w+) (?P<args>.*)").unwrap(),
+        Regex::new(r"(?P<command>^\$\w+)").unwrap(),
+    ];
+
+    for re in regexes {
+        if re.is_match(&text) {
+            let caps = re.captures(text).unwrap();
+
+            let command = match caps.name("command") {
+                Some(command) => String::from(command.as_str()),
+                None => String::new(),
+            };
+
+            let target = match caps.name("target") {
+                Some(target) => String::from(target.as_str()),
+                None => String::new(),
+            };
+
+            let args = match caps.name("args") {
+                Some(args) => String::from(args.as_str()),
+                None => String::new(),
+            };
+
+            return Some((command, target, args));
+        }
+    }
+    None
 }
 
 enum Punishment {

@@ -54,7 +54,7 @@ impl EventHandler for Handler {
     fn message_delete(&self, ctx: Context, channel_id: ChannelId, message_id: MessageId) {
         let deleted_message = ctx.cache.read().message(channel_id, message_id);
         if let Some(message) = deleted_message {
-            let stripped_message = &message.content.clone().replace("`", "");
+            let stripped_message = message.content.clone().replace("`", "");
 
             logging::log(
                 ctx,
@@ -68,7 +68,10 @@ impl EventHandler for Handler {
     }
 
     fn guild_member_addition(&self, ctx: Context, _guild_id: GuildId, mut new_member: Member) {
-        let join_roles = vec![get_env!("ABB_JOIN_ROLE_1", u64), get_env!("ABB_JOIN_ROLE_2", u64)];
+        let join_roles = vec![
+            get_env!("ABB_JOIN_ROLE_1", u64),
+            get_env!("ABB_JOIN_ROLE_2", u64),
+        ];
 
         new_member
             .add_role(
