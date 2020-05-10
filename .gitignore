@@ -2,3 +2,4 @@
 /.idea
 .env
 dumb_channels.ron
+.DS_Store
