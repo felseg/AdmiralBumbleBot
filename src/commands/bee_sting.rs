@@ -9,7 +9,7 @@ mod create_dumb_channel;
 mod kick;
 mod mute;
 
-const NUMBER_OF_STINGS: u8 = 1;
+const NUMBER_OF_STINGS: u8 = 3;
 
 pub fn bee_sting(ctx: Context, msg: &Message, _command: &str, _target: &str, _args: &str) {
     &msg.channel_id
