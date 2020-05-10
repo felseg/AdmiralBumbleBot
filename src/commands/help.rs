@@ -1,6 +1,6 @@
 use serenity::{model::channel::Message, prelude::Context, utils::Color};
 
-pub fn help(ctx: Context, msg: &Message) {
+pub fn help(ctx: &Context, msg: &Message) {
     if let Err(e) = msg.channel_id.send_message(&ctx.http, |m| {
         m.embed(|e| {
             e.title("Help - Command List");

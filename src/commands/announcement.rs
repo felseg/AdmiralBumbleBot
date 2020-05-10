@@ -8,7 +8,7 @@ use {
     },
 };
 
-pub fn announcement(ctx: Context, msg: &Message) {
+pub fn announcement(ctx: &Context, msg: &Message) {
     let guild_id = msg.guild_id.expect("Error getting guild ID");
     let author = &msg.author;
 

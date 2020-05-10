@@ -49,7 +49,7 @@ impl EventHandler for Handler {
     }
 
     fn message(&self, ctx: Context, msg: Message) {
-        commands::execute(ctx, msg);
+        commands::execute(ctx, &msg);
     }
 
     fn message_delete(&self, ctx: Context, channel_id: ChannelId, message_id: MessageId) {

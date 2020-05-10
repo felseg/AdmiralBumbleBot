@@ -1,3 +1,8 @@
+#![warn(
+    clippy::all,
+    clippy::needless_pass_by_value,
+)]
+
 use handler::Handler;
 
 use dotenv::dotenv;

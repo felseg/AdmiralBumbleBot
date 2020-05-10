@@ -12,7 +12,7 @@ mod give_admin;
 mod help;
 mod punish;
 
-pub fn execute(ctx: Context, msg: Message) {
+pub fn execute(ctx: Context, msg: &Message) {
     if !msg.content.starts_with('$') {
         return;
     }
@@ -30,13 +30,13 @@ pub fn execute(ctx: Context, msg: Message) {
     }
 
     match command.as_str() {
-        "$help" => help::help(ctx, &msg),
-        "$buzz" => buzz::buzz(ctx, &msg),
-        "$kick" => punish::punish(ctx, &msg, &target, &args, punish::Punishment::Kick),
-        "$ban" => punish::punish(ctx, &msg, &target, &args, punish::Punishment::Ban),
-        "$mute" => punish::punish(ctx, &msg, &target, &args, punish::Punishment::Mute),
-        "$unmute" => punish::punish(ctx, &msg, &target, &args, punish::Punishment::Unmute),
-        "$announcement" => announcement::announcement(ctx, &msg),
+        "$help" => help::help(&ctx, &msg),
+        "$buzz" => buzz::buzz(&ctx, &msg),
+        "$kick" => punish::punish(ctx, &msg, &target, &args, &punish::Punishment::Kick),
+        "$ban" => punish::punish(ctx, &msg, &target, &args, &punish::Punishment::Ban),
+        "$mute" => punish::punish(ctx, &msg, &target, &args, &punish::Punishment::Mute),
+        "$unmute" => punish::punish(ctx, &msg, &target, &args, &punish::Punishment::Unmute),
+        "$announcement" => announcement::announcement(&ctx, &msg),
         "$giveAdmin" => give_admin::give_admin(ctx, &msg),
         "$clean" => clean::clean(ctx, &msg, &args),
         _ => {}
