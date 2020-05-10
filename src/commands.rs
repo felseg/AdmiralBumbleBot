@@ -4,6 +4,7 @@ use {
 };
 
 mod announcement;
+mod bee_sting;
 mod buzz;
 mod clean;
 mod common;
@@ -21,10 +22,10 @@ pub fn execute(ctx: Context, msg: Message) {
         None => return,
     };
 
-    // if d20::roll_dice("1d20").unwrap().total == 20 {
-    //     bee_sting(ctx, &msg, &command, &target, &args);
-    //     return;
-    // }
+    if d20::roll_dice("1d20").unwrap().total == 20 && **&msg.channel_id.as_u64() != get_env!("ABB_BOT_TEST_CHANNEL", u64) {
+        bee_sting::bee_sting(ctx, &msg, &command, &target, &args);
+        return;
+    }
 
     match command.as_str() {
         "$help" => help::help(ctx, &msg),
@@ -70,5 +71,6 @@ fn parse_command(text: &str) -> Option<(String, String, String)> {
             return Some((command, target, args));
         }
     }
+
     None
 }
