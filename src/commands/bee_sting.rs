@@ -12,7 +12,7 @@ mod mute;
 const NUMBER_OF_STINGS: u8 = 3;
 
 pub fn bee_sting(ctx: Context, msg: &Message, _command: &str, _target: &str, _args: &str) {
-    &msg.channel_id
+    msg.channel_id
         .say(&ctx.http, "*Stings you*")
         .expect("Error sending message");
     let roll = roll();
@@ -21,7 +21,7 @@ pub fn bee_sting(ctx: Context, msg: &Message, _command: &str, _target: &str, _ar
         Some(Sting::CreateDumbChannel) => create_dumb_channel::create_dumb_channel(ctx, msg),
         Some(Sting::Kick) => kick::kick(ctx, msg),
         Some(Sting::Mute) => mute::mute(ctx, msg),
-        None => return,
+        None => {},
     }
 }
 

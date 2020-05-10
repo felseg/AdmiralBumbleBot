@@ -5,7 +5,7 @@ use {
 };
 
 pub fn clean(ctx: Context, msg: &Message, args: &str) {
-    let guild_id = *&msg.guild_id.expect("Error getting guild ID");
+    let guild_id = msg.guild_id.expect("Error getting guild ID");
     let author = &msg.author;
 
     match args.parse::<u64>() {
@@ -37,7 +37,8 @@ pub fn clean(ctx: Context, msg: &Message, args: &str) {
                 log_text.pop(); //remove the '!'
                 log_text.push_str(format!(" in <#{}>:\n", channel_id.0).as_str());
 
-                for i in 0..messages.len() - 1 {
+                let range = 0..messages.len() - 1;
+                for i in range {
                     let stripped_message = messages[i].content.clone().replace("`", "");
                     let author = messages[i].author.clone();
 
@@ -51,8 +52,8 @@ pub fn clean(ctx: Context, msg: &Message, args: &str) {
                 }
 
                 let last_message = messages.pop().unwrap();
-                let stripped_message = last_message.content.clone().replace("`", "");
-                let author = last_message.author.clone();
+                let stripped_message = last_message.content.replace("`", "");
+                let author = last_message.author;
 
                 log_text.push_str(
                     format!(

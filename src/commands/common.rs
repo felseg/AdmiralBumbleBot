@@ -7,13 +7,6 @@ use serenity::{
     prelude::Context,
 };
 
-pub enum Punishment {
-    Kick,
-    Ban,
-    Mute,
-    Unmute,
-}
-
 pub fn random_user(ctx: &Context, guild_id: &GuildId) -> Member {
     let member_count = guild_id
         .to_guild_cached(&ctx.cache)
@@ -35,12 +28,7 @@ pub fn random_user(ctx: &Context, guild_id: &GuildId) -> Member {
 pub fn confirm_admin(ctx: &Context, user: &User, guild: GuildId) -> bool {
     match user.has_role(&ctx.http, guild, RoleId(get_env!("ABB_ADMIN_ROLE", u64))) {
         Ok(b) => {
-            if b || user.id == get_env!("ABB_USER_ID", u64) {
-                //If command user has Admin role or is AdmiralBumbleBee himself
-                true
-            } else {
-                false
-            }
+            b || user.id == get_env!("ABB_USER_ID", u64)
         }
         Err(e) => {
             eprintln!("Error authenticating user: {}", e);

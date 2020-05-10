@@ -11,9 +11,9 @@ pub fn create_dumb_channel(ctx: Context, msg: &Message) {
         None => return,
     };
 
-    &msg.channel_id.say(&ctx.http, "Creating a fun new channel!");
+    msg.channel_id.say(&ctx.http, "Creating a fun new channel!").expect("Error sending message");
 
-    &msg.guild_id
+    msg.guild_id
         .expect("Error getting guild ID")
         .create_channel(ctx.http, |ch| {
             ch.name(chan_name);
@@ -35,7 +35,7 @@ fn get_random_channel() -> Option<(String, String)> {
         }
     };
 
-    let names: Vec<String> = channel_names.keys().map(|n| n.clone()).collect();
+    let names: Vec<String> = channel_names.keys().cloned().collect();
 
     let roll = d20::roll_dice(format!("1d{}", names.len()).as_str())
         .unwrap()
@@ -65,6 +65,6 @@ mod tests {
             }
         };
 
-        assert!(channel_names.len() > 0);
+        assert!(!channel_names.is_empty());
     }
 }

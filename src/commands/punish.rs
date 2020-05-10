@@ -9,20 +9,21 @@ use {
 
 const BAN_DELETE_DAYS: u8 = 0;
 
-pub fn punish(
-    ctx: Context,
-    msg: &Message,
-    target: &str,
-    args: &str,
-    punishment_type: common::Punishment,
-) {
-    let guild_id = *&msg.guild_id.expect("Error getting guild ID");
+pub enum Punishment {
+    Kick,
+    Ban,
+    Mute,
+    Unmute,
+}
+
+pub fn punish(ctx: Context, msg: &Message, target: &str, args: &str, punishment_type: Punishment) {
+    let guild_id = msg.guild_id.expect("Error getting guild ID");
     let author = &msg.author;
 
     if common::confirm_admin(&ctx, &author, guild_id) || d20::roll_dice("2d20").unwrap().total >= 39
     {
         match punishment_type {
-            common::Punishment::Kick => {
+            Punishment::Kick => {
                 if let Err(e) = msg
                     .guild_id
                     .unwrap()
@@ -41,7 +42,7 @@ pub fn punish(
                 }
                 logging::log(ctx, &log_text);
             }
-            common::Punishment::Ban => {
+            Punishment::Ban => {
                 if let Err(e) = msg.guild_id.unwrap().ban(
                     &ctx.http,
                     UserId(target.parse().unwrap()),
@@ -60,7 +61,7 @@ pub fn punish(
                 }
                 logging::log(ctx, &log_text);
             }
-            common::Punishment::Mute => {
+            Punishment::Mute => {
                 let mut member = ctx
                     .http
                     .get_member(*guild_id.as_u64(), target.parse().unwrap())
@@ -80,7 +81,7 @@ pub fn punish(
                 }
                 logging::log(ctx, &log_text);
             }
-            common::Punishment::Unmute => {
+            Punishment::Unmute => {
                 let mut member = ctx
                     .http
                     .get_member(*guild_id.as_u64(), target.parse().unwrap())

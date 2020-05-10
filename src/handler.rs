@@ -6,9 +6,10 @@ use serenity::{
     model::{
         channel::Message,
         event::MessageUpdateEvent,
+        gateway::{Activity, Ready},
         guild::Member,
         id::{ChannelId, GuildId, MessageId},
-        user::User, gateway::{Activity, Ready},
+        user::User,
     },
 };
 
@@ -54,7 +55,7 @@ impl EventHandler for Handler {
     fn message_delete(&self, ctx: Context, channel_id: ChannelId, message_id: MessageId) {
         let deleted_message = ctx.cache.read().message(channel_id, message_id);
         if let Some(message) = deleted_message {
-            let stripped_message = message.content.clone().replace("`", "");
+            let stripped_message = message.content.replace("`", "");
 
             logging::log(
                 ctx,
@@ -81,7 +82,7 @@ impl EventHandler for Handler {
                 return;
             }
 
-            let old_stripped = &msg.content.clone().replace("`", "");
+            let old_stripped = &msg.content.replace("`", "");
             let new_stripped = &new_content.replace("`", "");
 
             logging::log(
@@ -100,6 +101,8 @@ impl EventHandler for Handler {
     }
 
     fn ready(&self, ctx: Context, _data_about_bot: Ready) {
-        ctx.set_activity(Activity::playing("See my insides at https://git.io/JfW94 😘"));
+        ctx.set_activity(Activity::playing(
+            "See my insides at https://git.io/JfW94 😘",
+        ));
     }
 }

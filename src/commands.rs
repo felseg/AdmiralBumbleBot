@@ -13,7 +13,7 @@ mod help;
 mod punish;
 
 pub fn execute(ctx: Context, msg: Message) {
-    if !msg.content.starts_with("$") {
+    if !msg.content.starts_with('$') {
         return;
     }
 
@@ -23,7 +23,7 @@ pub fn execute(ctx: Context, msg: Message) {
     };
 
     if d20::roll_dice("1d20").unwrap().total == 20
-        && **&msg.channel_id.as_u64() != get_env!("ABB_BOT_TEST_CHANNEL", u64)
+        && *msg.channel_id.as_u64() != get_env!("ABB_BOT_TEST_CHANNEL", u64)
     {
         bee_sting::bee_sting(ctx, &msg, &command, &target, &args);
         return;
@@ -32,10 +32,10 @@ pub fn execute(ctx: Context, msg: Message) {
     match command.as_str() {
         "$help" => help::help(ctx, &msg),
         "$buzz" => buzz::buzz(ctx, &msg),
-        "$kick" => punish::punish(ctx, &msg, &target, &args, common::Punishment::Kick),
-        "$ban" => punish::punish(ctx, &msg, &target, &args, common::Punishment::Ban),
-        "$mute" => punish::punish(ctx, &msg, &target, &args, common::Punishment::Mute),
-        "$unmute" => punish::punish(ctx, &msg, &target, &args, common::Punishment::Unmute),
+        "$kick" => punish::punish(ctx, &msg, &target, &args, punish::Punishment::Kick),
+        "$ban" => punish::punish(ctx, &msg, &target, &args, punish::Punishment::Ban),
+        "$mute" => punish::punish(ctx, &msg, &target, &args, punish::Punishment::Mute),
+        "$unmute" => punish::punish(ctx, &msg, &target, &args, punish::Punishment::Unmute),
         "$announcement" => announcement::announcement(ctx, &msg),
         "$giveAdmin" => give_admin::give_admin(ctx, &msg),
         "$clean" => clean::clean(ctx, &msg, &args),
