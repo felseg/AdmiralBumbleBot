@@ -11,7 +11,9 @@ pub fn create_dumb_channel(ctx: Context, msg: &Message) {
         None => return,
     };
 
-    msg.channel_id.say(&ctx.http, "Creating a fun new channel!").expect("Error sending message");
+    msg.channel_id
+        .say(&ctx.http, "Creating a fun new channel!")
+        .expect("Error sending message");
 
     msg.guild_id
         .expect("Error getting guild ID")
