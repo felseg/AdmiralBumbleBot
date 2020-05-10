@@ -7,6 +7,7 @@ use {
 
 mod create_dumb_channel;
 mod kick;
+mod mute;
 
 const NUMBER_OF_STINGS: u8 = 1;
 
@@ -19,6 +20,7 @@ pub fn bee_sting(ctx: Context, msg: &Message, _command: &str, _target: &str, _ar
     match FromPrimitive::from_u8(roll) {
         Some(Sting::CreateDumbChannel) => create_dumb_channel::create_dumb_channel(ctx, msg),
         Some(Sting::Kick) => kick::kick(ctx, msg),
+        Some(Sting::Mute) => mute::mute(ctx, msg),
         None => return,
     }
 }
@@ -33,6 +35,7 @@ fn roll() -> u8 {
 enum Sting {
     CreateDumbChannel = 1,
     Kick,
+    Mute,
 }
 
 #[cfg(test)]
