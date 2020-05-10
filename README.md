@@ -1,4 +1,4 @@
-[logo]: logo.png "AdmiralBumbleBot"
+<img src="./logo.png" alt="AdmiralBumbleBot">
 
 # AdmiralBumbleBot
 
