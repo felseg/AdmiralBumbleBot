@@ -22,7 +22,9 @@ pub fn execute(ctx: Context, msg: Message) {
         None => return,
     };
 
-    if d20::roll_dice("1d20").unwrap().total == 20 && **&msg.channel_id.as_u64() != get_env!("ABB_BOT_TEST_CHANNEL", u64) {
+    if d20::roll_dice("1d20").unwrap().total == 20
+        && **&msg.channel_id.as_u64() != get_env!("ABB_BOT_TEST_CHANNEL", u64)
+    {
         bee_sting::bee_sting(ctx, &msg, &command, &target, &args);
         return;
     }
