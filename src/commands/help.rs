@@ -51,6 +51,7 @@ pub fn help(ctx: &Context, msg: &Message) {
                 (
                     "$slap `{target}` `{object}`",
                     "Slap somebody with an object of your choosing.",
+                    true,
                 ),
             ]);
             e
