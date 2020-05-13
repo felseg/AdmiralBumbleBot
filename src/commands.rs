@@ -12,7 +12,7 @@ mod give_admin;
 mod help;
 mod punish;
 
-pub fn execute(ctx: Context, msg: &Message) {
+pub fn execute(ctx: &Context, msg: &Message) {
     if !msg.content.starts_with('$') {
         return;
     }

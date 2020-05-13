@@ -11,7 +11,7 @@ mod mute;
 
 const NUMBER_OF_STINGS: u8 = 3;
 
-pub fn bee_sting(ctx: Context, msg: &Message, _command: &str, _target: &str, _args: &str) {
+pub fn bee_sting(ctx: &Context, msg: &Message, _command: &str, _target: &str, _args: &str) {
     msg.channel_id
         .say(&ctx.http, "*Stings you*")
         .expect("Error sending message");

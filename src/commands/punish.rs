@@ -16,7 +16,13 @@ pub enum Punishment {
     Unmute,
 }
 
-pub fn punish(ctx: Context, msg: &Message, target: &str, args: &str, punishment_type: &Punishment) {
+pub fn punish(
+    ctx: &Context,
+    msg: &Message,
+    target: &str,
+    args: &str,
+    punishment_type: &Punishment,
+) {
     let guild_id = msg.guild_id.expect("Error getting guild ID");
     let author = &msg.author;
 

@@ -1,7 +1,4 @@
-#![warn(
-    clippy::all,
-    clippy::needless_pass_by_value,
-)]
+#![warn(clippy::all, clippy::needless_pass_by_value)]
 
 use handler::Handler;
 
@@ -13,6 +10,7 @@ mod macros;
 mod commands;
 mod handler;
 mod logging;
+mod storage;
 
 const CACHE_SIZE: usize = 100;
 

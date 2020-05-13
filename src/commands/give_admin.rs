@@ -3,7 +3,7 @@ use {
     serenity::{model::channel::Message, prelude::Context},
 };
 
-pub fn give_admin(ctx: Context, msg: &Message) {
+pub fn give_admin(ctx: &Context, msg: &Message) {
     let guild_id = msg.guild_id.expect("Error getting guild ID");
     let author = &msg.author;
 

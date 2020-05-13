@@ -4,7 +4,7 @@ use {
     serenity::{model::channel::Message, prelude::Context},
 };
 
-pub fn clean(ctx: Context, msg: &Message, args: &str) {
+pub fn clean(ctx: &Context, msg: &Message, args: &str) {
     let guild_id = msg.guild_id.expect("Error getting guild ID");
     let author = &msg.author;
 
