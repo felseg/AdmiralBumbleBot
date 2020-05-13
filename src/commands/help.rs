@@ -43,6 +43,11 @@ pub fn help(ctx: &Context, msg: &Message) {
                     "Deletes the specified number of messages in the channel you summon me from.",
                     true,
                 ),
+                (
+                    "$getMessageData `{target}`",
+                    "Shows some info about the users posting habits. (UNFINISHED)",
+                    true,
+                ),
             ]);
             e
         });
