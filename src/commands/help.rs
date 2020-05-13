@@ -48,6 +48,10 @@ pub fn help(ctx: &Context, msg: &Message) {
                     "Shows some info about the users posting habits. (UNFINISHED)",
                     true,
                 ),
+                (
+                    "$slap `{target}` `{object}`",
+                    "Slap somebody with an object of your choosing.",
+                ),
             ]);
             e
         });
