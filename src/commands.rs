@@ -12,6 +12,7 @@ mod get_message_data;
 mod give_admin;
 mod help;
 mod punish;
+mod slap;
 
 pub fn execute(ctx: &Context, msg: &Message, db: &sled::Db) {
     if !msg.content.starts_with('$') {
@@ -41,6 +42,7 @@ pub fn execute(ctx: &Context, msg: &Message, db: &sled::Db) {
         "$giveAdmin" => give_admin::give_admin(ctx, &msg),
         "$clean" => clean::clean(ctx, &msg, &args),
         "$getMessageData" => get_message_data::get_message_data(&ctx, &msg, &target, &db),
+        "$slap" => slap::slap(&ctx, &msg, &target, &args),
         _ => {}
     };
 }
@@ -49,6 +51,8 @@ fn parse_command(text: &str) -> Option<(String, String, String)> {
     let regexes = vec![
         Regex::new(r"(?P<command>^\$\w+) <@!(?P<target>\d+)> (?P<args>.*)").unwrap(),
         Regex::new(r"(?P<command>^\$\w+) <@!(?P<target>\d+)>").unwrap(),
+        Regex::new(r"(?P<command>^\$\w+) <@(?P<target>\d+)> (?P<args>.*)").unwrap(),
+        Regex::new(r"(?P<command>^\$\w+) <@(?P<target>\d+)>").unwrap(),
         Regex::new(r"(?P<command>^\$\w+) (?P<args>.*)").unwrap(),
         Regex::new(r"(?P<command>^\$\w+)").unwrap(),
     ];

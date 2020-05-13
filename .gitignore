@@ -1,6 +1,7 @@
 /target
 /storage
 /.idea
+/.vscode
 .env
 dumb_channels.ron
 .DS_Store
