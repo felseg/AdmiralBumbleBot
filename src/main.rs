@@ -13,11 +13,18 @@ mod logging;
 mod storage;
 
 const CACHE_SIZE: usize = 100;
+const STORAGE_PATH: &str = "storage";
 
 fn main() {
     dotenv().ok();
 
-    let mut client = Client::new(get_env!("ABB_TOKEN"), Handler).expect("Error creating client");
+    let mut client = Client::new(
+        get_env!("ABB_TOKEN"),
+        Handler {
+            storage: sled::open(STORAGE_PATH).expect("Error opening storage database"),
+        },
+    )
+    .expect("Error creating client");
 
     {
         let mut cache = client.cache_and_http.cache.write();

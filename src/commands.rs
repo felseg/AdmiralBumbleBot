@@ -8,11 +8,12 @@ mod bee_sting;
 mod buzz;
 mod clean;
 mod common;
+mod get_message_data;
 mod give_admin;
 mod help;
 mod punish;
 
-pub fn execute(ctx: &Context, msg: &Message) {
+pub fn execute(ctx: &Context, msg: &Message, db: &sled::Db) {
     if !msg.content.starts_with('$') {
         return;
     }
@@ -39,6 +40,7 @@ pub fn execute(ctx: &Context, msg: &Message) {
         "$announcement" => announcement::announcement(&ctx, &msg),
         "$giveAdmin" => give_admin::give_admin(ctx, &msg),
         "$clean" => clean::clean(ctx, &msg, &args),
+        "$getMessageData" => get_message_data::get_message_data(&ctx, &msg, &target, &db),
         _ => {}
     };
 }

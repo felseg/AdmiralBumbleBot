@@ -14,7 +14,9 @@ use {
     std::time,
 };
 
-pub struct Handler;
+pub struct Handler {
+    pub storage: sled::Db,
+}
 
 impl EventHandler for Handler {
     fn guild_member_addition(&self, ctx: Context, _guild_id: GuildId, mut new_member: Member) {
@@ -50,7 +52,7 @@ impl EventHandler for Handler {
     }
 
     fn message(&self, ctx: Context, msg: Message) {
-        commands::execute(&ctx, &msg);
+        commands::execute(&ctx, &msg, &self.storage);
 
         let user_id = *msg.author.id.as_u64();
         let channel_id = *msg.channel_id.as_u64();
@@ -60,7 +62,13 @@ impl EventHandler for Handler {
             .unwrap()
             .as_secs();
 
-        storage::log_activity(user_id, channel_id, words.len() as u16, timestamp);
+        storage::log_activity(
+            user_id,
+            channel_id,
+            words.len() as u16,
+            timestamp,
+            &self.storage,
+        );
     }
 
     fn message_delete(&self, ctx: Context, channel_id: ChannelId, message_id: MessageId) {
