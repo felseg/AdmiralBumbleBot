@@ -9,19 +9,22 @@ pub fn slap(ctx: &Context, msg: &Message, target: &str, args: &str) {
     let slappee = UserId(
         target
             .parse()
-            .expect("I cant parse because I'm a stupid robot"),
+            .expect("Error parsing target"),
     )
     .to_user(&ctx.http)
     .unwrap()
     .name;
 
+    let message_text = if args.to_ascii_uppercase().starts_with(&['A', 'E', 'I', 'O', 'U'][..]) {
+        format!("*{} slaps {} in the face with an {}!*", slapper, slappee, args)
+    } else {
+        format!("*{} slaps {} in the face with a {}!*", slapper, slappee, args)
+    };
+
     msg.channel_id
         .say(
             &ctx.http,
-            format!(
-                "*{} slaps {} in the face with a {}!*",
-                slapper, slappee, args,
-            ),
+            message_text,
         )
         .expect("Error sending message");
 }
