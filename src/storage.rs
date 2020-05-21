@@ -54,4 +54,8 @@ impl MessageModel {
     pub fn word_count(&self) -> u16 {
         self.word_count
     }
+
+    pub fn channel_id(&self) -> u64 {
+        self.channel_id
+    }
 }

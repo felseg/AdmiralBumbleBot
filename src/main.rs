@@ -1,4 +1,5 @@
 #![warn(clippy::all, clippy::needless_pass_by_value)]
+#![feature(drain_filter)]
 
 use handler::Handler;
 

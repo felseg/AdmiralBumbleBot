@@ -45,7 +45,7 @@ pub fn help(ctx: &Context, msg: &Message) {
                 ),
                 (
                     "$getMessageData `{target}`",
-                    "Shows some info about the users posting habits. (UNFINISHED)",
+                    "Shows some info about the users posting habits.",
                     true,
                 ),
                 (
