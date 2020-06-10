@@ -10,8 +10,11 @@ pub fn slap(ctx: &Context, msg: &Message, target: &str, args: &str) {
         .unwrap()
         .name;
 
-    if args.to_ascii_uppercase().contains("EVERYONE") || args.to_ascii_uppercase().contains("HERE") {
-        msg.channel_id.say(&ctx.http, "do not").expect("Error sending message");
+    if args.to_ascii_uppercase().contains("EVERYONE") || args.to_ascii_uppercase().contains("HERE")
+    {
+        msg.channel_id
+            .say(&ctx.http, "do not")
+            .expect("Error sending message");
         return;
     }
 
