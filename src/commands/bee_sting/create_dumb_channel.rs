@@ -45,7 +45,7 @@ fn get_random_channel() -> Option<(String, String)> {
 
     Some((
         names[roll as usize - 1].clone(),
-        channel_names[names[roll as usize].as_str()].clone(),
+        channel_names[names[roll as usize - 1].as_str()].clone(),
     ))
 }
 
