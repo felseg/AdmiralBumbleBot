@@ -1,6 +1,10 @@
+use serenity::model::channel::ReactionType;
 use {
     regex::Regex,
-    serenity::{model::channel::Message, prelude::Context},
+    serenity::{
+        model::{channel::Message, id::EmojiId},
+        prelude::Context,
+    },
 };
 
 mod announcement;
@@ -15,6 +19,20 @@ mod punish;
 mod slap;
 
 pub fn execute(ctx: &Context, msg: &Message, db: &sled::Db) {
+    if msg.content.to_ascii_lowercase().contains("sonic")
+        || msg.content.to_ascii_lowercase().contains("sanic")
+    {
+        msg.react(
+            &ctx.http,
+            ReactionType::Custom {
+                id: EmojiId(724619044606574645),
+                animated: false,
+                name: Some(String::from("sonic-1")),
+            },
+        )
+        .expect("I literally can't even");
+    }
+
     if !msg.content.starts_with('$') {
         return;
     }
