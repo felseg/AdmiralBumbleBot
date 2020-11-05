@@ -1,8 +1,7 @@
-use serenity::model::channel::ReactionType;
 use {
     regex::Regex,
     serenity::{
-        model::{channel::Message, id::EmojiId},
+        model::{channel::Message, id::EmojiId, channel::ReactionType},
         prelude::Context,
     },
 };
@@ -18,7 +17,7 @@ mod help;
 mod punish;
 mod slap;
 
-pub fn execute(ctx: &Context, msg: &Message, db: &sled::Db) {
+pub async fn execute(ctx: &Context, msg: &Message, db: &sled::Db) {
     if msg.content.to_ascii_lowercase().contains("sonic")
         || msg.content.to_ascii_lowercase().contains("sanic")
     {
@@ -30,6 +29,7 @@ pub fn execute(ctx: &Context, msg: &Message, db: &sled::Db) {
                 name: Some(String::from("sonic-1")),
             },
         )
+        .await
         .expect("I literally can't even");
     }
 
@@ -45,22 +45,22 @@ pub fn execute(ctx: &Context, msg: &Message, db: &sled::Db) {
     if d20::roll_dice("1d20").unwrap().total == 20
         && *msg.channel_id.as_u64() != get_env!("ABB_BOT_TEST_CHANNEL", u64)
     {
-        bee_sting::bee_sting(ctx, &msg, &command, &target, &args);
+        bee_sting::bee_sting(ctx, &msg, &command, &target, &args).await;
         return;
     }
 
     match command.as_str() {
-        "$help" => help::help(&ctx, &msg),
-        "$buzz" => buzz::buzz(&ctx, &msg),
-        "$kick" => punish::punish(ctx, &msg, &target, &args, &punish::Punishment::Kick),
-        "$ban" => punish::punish(ctx, &msg, &target, &args, &punish::Punishment::Ban),
-        "$mute" => punish::punish(ctx, &msg, &target, &args, &punish::Punishment::Mute),
-        "$unmute" => punish::punish(ctx, &msg, &target, &args, &punish::Punishment::Unmute),
-        "$announcement" => announcement::announcement(&ctx, &msg),
-        "$giveAdmin" => give_admin::give_admin(ctx, &msg),
-        "$clean" => clean::clean(ctx, &msg, &args),
-        "$getMessageData" => get_message_data::get_message_data(&ctx, &msg, &target, &db),
-        "$slap" => slap::slap(&ctx, &msg, &target, &args),
+        "$help" => help::help(&ctx, &msg).await,
+        "$buzz" => buzz::buzz(&ctx, &msg).await,
+        "$kick" => punish::punish(ctx, &msg, &target, &args, &punish::Punishment::Kick).await,
+        "$ban" => punish::punish(ctx, &msg, &target, &args, &punish::Punishment::Ban).await,
+        "$mute" => punish::punish(ctx, &msg, &target, &args, &punish::Punishment::Mute).await,
+        "$unmute" => punish::punish(ctx, &msg, &target, &args, &punish::Punishment::Unmute).await,
+        "$announcement" => announcement::announcement(&ctx, &msg).await,
+        "$giveAdmin" => give_admin::give_admin(ctx, &msg).await,
+        "$clean" => clean::clean(ctx, &msg, &args).await,
+        "$getMessageData" => get_message_data::get_message_data(&ctx, &msg, &target, &db).await,
+        "$slap" => slap::slap(&ctx, &msg, &target, &args).await,
         _ => {}
     };
 }

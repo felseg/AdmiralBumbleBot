@@ -5,7 +5,7 @@ use {
     std::{collections::HashMap, fs::File},
 };
 
-pub fn create_dumb_channel(ctx: &Context, msg: &Message) {
+pub async fn create_dumb_channel(ctx: &Context, msg: &Message) {
     let (chan_name, chan_description) = match get_random_channel() {
         Some(res) => res,
         None => return,
@@ -13,6 +13,7 @@ pub fn create_dumb_channel(ctx: &Context, msg: &Message) {
 
     msg.channel_id
         .say(&ctx.http, "Creating a fun new channel!")
+        .await
         .expect("Error sending message");
 
     msg.guild_id
@@ -23,6 +24,7 @@ pub fn create_dumb_channel(ctx: &Context, msg: &Message) {
             ch.category(get_env!("ABB_MAIN_CHANNEL_CATEGORY", u64));
             ch
         })
+        .await
         .expect("Error creating channel");
 }
 

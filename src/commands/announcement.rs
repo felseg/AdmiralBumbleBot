@@ -8,7 +8,7 @@ use {
     },
 };
 
-pub fn announcement(ctx: &Context, msg: &Message) {
+pub async fn announcement(ctx: &Context, msg: &Message) {
     let guild_id = msg.guild_id.expect("Error getting guild ID");
     let author = &msg.author;
 
@@ -17,14 +17,15 @@ pub fn announcement(ctx: &Context, msg: &Message) {
         None => return,
     };
 
-    let random_user = common::random_user(&ctx, &guild_id);
+    let random_user = common::random_user(&ctx, &guild_id).await;
 
-    if common::confirm_admin(&ctx, &author, guild_id) || d20::roll_dice("2d20").unwrap().total >= 39
+    if common::confirm_admin(&ctx, &author, guild_id).await
+        || d20::roll_dice("2d20").unwrap().total >= 39
     {
-        if let Err(e) =
-            ChannelId(get_env!("ABB_ANNOUNCEMENT_CHANNEL", u64)).send_message(&ctx.http, |m| {
+        if let Err(e) = ChannelId(get_env!("ABB_ANNOUNCEMENT_CHANNEL", u64))
+            .send_message(&ctx.http, |m| {
                 m.tts(true);
-                m.content(format!("Hey, <@!{}>! Yes, you!", random_user.user_id()));
+                m.content(format!("Hey, <@!{}>! Yes, you!", random_user.user.id));
                 m.embed(|e| {
                     e.title(title);
                     e.description(body);
@@ -33,6 +34,7 @@ pub fn announcement(ctx: &Context, msg: &Message) {
                 });
                 m
             })
+            .await
         {
             eprintln!("Error sending announcement: {}", e);
         }

@@ -1,14 +1,15 @@
 use {
     crate::{commands, logging, storage},
     serenity::{
-        client::{Context, EventHandler},
+        async_trait, 
+        prelude::*,
         model::{
             channel::Message,
             event::MessageUpdateEvent,
-            gateway::{Activity, Ready},
             guild::Member,
             id::{ChannelId, GuildId, MessageId},
-            user::User,
+            prelude::User,
+            prelude::{Activity, Ready},
         },
     },
     std::time,
@@ -18,8 +19,14 @@ pub struct Handler {
     pub storage: sled::Db,
 }
 
+#[async_trait]
 impl EventHandler for Handler {
-    fn guild_member_addition(&self, ctx: Context, _guild_id: GuildId, mut new_member: Member) {
+    async fn guild_member_addition(
+        &self,
+        ctx: Context,
+        _guild_id: GuildId,
+        mut new_member: Member,
+    ) {
         let join_roles: Vec<u64> = vec![
             get_env!("ABB_JOIN_ROLE_1", u64),
             get_env!("ABB_JOIN_ROLE_2", u64),
@@ -30,15 +37,17 @@ impl EventHandler for Handler {
                 &ctx.http,
                 join_roles[d20::roll_dice("1d2").unwrap().total as usize - 1],
             )
+            .await
             .expect("Error roling new user");
 
         logging::log(
             &ctx,
             format!("📥 User joined: `{}`", new_member.distinct()).as_str(),
-        );
+        )
+        .await;
     }
 
-    fn guild_member_removal(
+    async fn guild_member_removal(
         &self,
         ctx: Context,
         _guild: GuildId,
@@ -48,11 +57,12 @@ impl EventHandler for Handler {
         logging::log(
             &ctx,
             format!("📤 User left: `{}#{}`", user.name, user.discriminator).as_str(),
-        );
+        )
+        .await;
     }
 
-    fn message(&self, ctx: Context, msg: Message) {
-        commands::execute(&ctx, &msg, &self.storage);
+    async fn message(&self, ctx: Context, msg: Message) {
+        commands::execute(&ctx, &msg, &self.storage).await;
 
         let user_id = *msg.author.id.as_u64();
         let channel_id = *msg.channel_id.as_u64();
@@ -71,8 +81,8 @@ impl EventHandler for Handler {
         );
     }
 
-    fn message_delete(&self, ctx: Context, channel_id: ChannelId, message_id: MessageId) {
-        let deleted_message = ctx.cache.read().message(channel_id, message_id);
+    async fn message_delete(&self, ctx: Context, channel_id: ChannelId, message_id: MessageId) {
+        let deleted_message = ctx.cache.message(channel_id, message_id).await;
         if let Some(message) = deleted_message {
             let stripped_message = message.content.replace("`", "");
 
@@ -83,11 +93,12 @@ impl EventHandler for Handler {
                     channel_id, message.author.name, message.author.discriminator, stripped_message
                 )
                 .as_str(),
-            );
+            )
+            .await;
         }
     }
 
-    fn message_update(
+    async fn message_update(
         &self,
         ctx: Context,
         old_if_available: Option<Message>,
@@ -115,13 +126,15 @@ impl EventHandler for Handler {
                     new_stripped
                 )
                 .as_ref(),
-            );
+            )
+            .await;
         }
     }
 
-    fn ready(&self, ctx: Context, _data_about_bot: Ready) {
+    async fn ready(&self, ctx: Context, _data_about_bot: Ready) {
         ctx.set_activity(Activity::playing(
             "See my insides at https://git.io/JfW94 😘",
-        ));
+        ))
+        .await;
     }
 }

@@ -3,10 +3,11 @@ use serenity::{
     prelude::Context,
 };
 
-pub fn slap(ctx: &Context, msg: &Message, target: &str, args: &str) {
+pub async fn slap(ctx: &Context, msg: &Message, target: &str, args: &str) {
     let slapper = &msg.author.name;
     let slappee = UserId(target.parse().expect("Error parsing target"))
         .to_user(&ctx.http)
+        .await
         .unwrap()
         .name;
 
@@ -14,6 +15,7 @@ pub fn slap(ctx: &Context, msg: &Message, target: &str, args: &str) {
     {
         msg.channel_id
             .say(&ctx.http, "do not")
+            .await
             .expect("Error sending message");
         return;
     }
@@ -35,5 +37,6 @@ pub fn slap(ctx: &Context, msg: &Message, target: &str, args: &str) {
 
     msg.channel_id
         .say(&ctx.http, message_text)
+        .await
         .expect("Error sending message");
 }

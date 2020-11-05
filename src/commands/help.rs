@@ -1,11 +1,13 @@
 use serenity::{model::channel::Message, prelude::Context, utils::Color};
 
-pub fn help(ctx: &Context, msg: &Message) {
-    if let Err(e) = msg.channel_id.send_message(&ctx.http, |m| {
-        m.embed(|e| {
-            e.title("Help - Command List");
-            e.color(Color::from_rgb(255, 255, 0));
-            e.fields(vec![
+pub async fn help(ctx: &Context, msg: &Message) {
+    if let Err(e) = msg
+        .channel_id
+        .send_message(&ctx.http, |m| {
+            m.embed(|e| {
+                e.title("Help - Command List");
+                e.color(Color::from_rgb(255, 255, 0));
+                e.fields(vec![
                 ("$help", "Show this again.", true),
                 ("$buzz", "BUZZ!", true),
                 (
@@ -54,10 +56,12 @@ pub fn help(ctx: &Context, msg: &Message) {
                     true,
                 ),
             ]);
-            e
-        });
-        m
-    }) {
+                e
+            });
+            m
+        })
+        .await
+    {
         eprintln!("Error displaying help: {}", e);
     }
 }

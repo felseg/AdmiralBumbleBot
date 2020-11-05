@@ -8,14 +8,17 @@ use {
     std::collections::HashMap,
 };
 
-pub fn get_message_data(ctx: &Context, msg: &Message, target: &str, db: &sled::Db) {
+pub async fn get_message_data(ctx: &Context, msg: &Message, target: &str, db: &sled::Db) {
     let user_id: u64 = target.parse().unwrap();
-    let username = UserId(user_id).to_user(&ctx.http).unwrap().name;
+
+    let username = UserId(user_id).to_user(&ctx.http).await.unwrap().name;
+
     let data = storage::get_user_message_data(user_id, db);
 
     if data.is_empty() {
         msg.channel_id
             .say(&ctx.http, format!("No post data found for {}!", username))
+            .await
             .unwrap();
         return;
     }
@@ -36,6 +39,7 @@ pub fn get_message_data(ctx: &Context, msg: &Message, target: &str, db: &sled::D
                 favorite_channel
             ),
         )
+        .await
         .unwrap();
 }
 

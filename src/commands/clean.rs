@@ -4,13 +4,13 @@ use {
     serenity::{model::channel::Message, prelude::Context},
 };
 
-pub fn clean(ctx: &Context, msg: &Message, args: &str) {
+pub async fn clean(ctx: &Context, msg: &Message, args: &str) {
     let guild_id = msg.guild_id.expect("Error getting guild ID");
     let author = &msg.author;
 
     match args.parse::<u64>() {
         Ok(limit) => {
-            if common::confirm_admin(&ctx, author, guild_id)
+            if common::confirm_admin(&ctx, author, guild_id).await
                 || d20::roll_dice("2d20").unwrap().total >= 39
             {
                 let channel_id = msg.channel_id;
@@ -19,6 +19,7 @@ pub fn clean(ctx: &Context, msg: &Message, args: &str) {
                     .messages(&ctx.http, |retriever| {
                         retriever.before(&msg.id).limit(limit)
                     })
+                    .await
                     .expect("Error getting messages to delete");
 
                 messages.reverse();
@@ -26,12 +27,14 @@ pub fn clean(ctx: &Context, msg: &Message, args: &str) {
 
                 channel_id
                     .delete_messages(&ctx.http, messages.iter())
+                    .await
                     .expect("Error deleting messages");
 
                 let mut log_text = format!("🧼 {} messages cleaned by <@!{}>!", limit, author.id.0);
 
                 channel_id
                     .say(&ctx.http, &log_text)
+                    .await
                     .expect("Failed to send message");
 
                 log_text.pop(); //remove the '!'
@@ -63,7 +66,7 @@ pub fn clean(ctx: &Context, msg: &Message, args: &str) {
                     .as_str(),
                 );
 
-                logging::log(ctx, log_text.as_str());
+                logging::log(ctx, log_text.as_str()).await;
             }
         }
         Err(e) => eprintln!("Error parsing numeric argument: {}", e),

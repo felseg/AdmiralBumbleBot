@@ -7,16 +7,8 @@ use serenity::{
     prelude::Context,
 };
 
-pub fn random_user(ctx: &Context, guild_id: &GuildId) -> Member {
-    let member_count = guild_id
-        .to_guild_cached(&ctx.cache)
-        .unwrap()
-        .read()
-        .member_count;
-
-    let members: Vec<Member> = guild_id
-        .members(&ctx.http, Some(member_count), None)
-        .unwrap();
+pub async fn random_user(ctx: &Context, guild_id: &GuildId) -> Member {
+    let members: Vec<Member> = guild_id.members(&ctx.http, None, None).await.unwrap();
 
     members[(d20::roll_dice(format!("1d{}", members.len()).as_str())
         .unwrap()
@@ -25,8 +17,11 @@ pub fn random_user(ctx: &Context, guild_id: &GuildId) -> Member {
     .clone()
 }
 
-pub fn confirm_admin(ctx: &Context, user: &User, guild: GuildId) -> bool {
-    match user.has_role(&ctx.http, guild, RoleId(get_env!("ABB_ADMIN_ROLE", u64))) {
+pub async fn confirm_admin(ctx: &Context, user: &User, guild: GuildId) -> bool {
+    match user
+        .has_role(&ctx.http, guild, RoleId(get_env!("ABB_ADMIN_ROLE", u64)))
+        .await
+    {
         Ok(b) => b || user.id == get_env!("ABB_USER_ID", u64),
         Err(e) => {
             eprintln!("Error authenticating user: {}", e);

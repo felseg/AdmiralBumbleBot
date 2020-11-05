@@ -13,26 +13,20 @@ mod handler;
 mod logging;
 mod storage;
 
-const CACHE_SIZE: usize = 100;
 const STORAGE_PATH: &str = "storage";
 
-fn main() {
+#[tokio::main]
+async fn main() {
     dotenv().ok();
 
-    let mut client = Client::new(
-        get_env!("ABB_TOKEN"),
-        Handler {
+    let mut client = Client::builder(get_env!("ABB_TOKEN"))
+        .event_handler(Handler {
             storage: sled::open(STORAGE_PATH).expect("Error opening storage database"),
-        },
-    )
-    .expect("Error creating client");
+        })
+        .await
+        .expect("Error creating client");
 
-    {
-        let mut cache = client.cache_and_http.cache.write();
-        cache.settings_mut().max_messages(CACHE_SIZE);
-    }
-
-    if let Err(e) = client.start() {
+    if let Err(e) = client.start().await {
         eprintln!("Error starting client: {}", e);
     }
 }
