@@ -1,8 +1,7 @@
 use {
     crate::{commands, logging, storage},
     serenity::{
-        async_trait, 
-        prelude::*,
+        async_trait,
         model::{
             channel::Message,
             event::MessageUpdateEvent,
@@ -11,6 +10,7 @@ use {
             prelude::User,
             prelude::{Activity, Ready},
         },
+        prelude::*,
     },
     std::time,
 };

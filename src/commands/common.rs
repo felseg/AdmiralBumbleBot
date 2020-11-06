@@ -7,14 +7,24 @@ use serenity::{
     prelude::Context,
 };
 
-pub async fn random_user(ctx: &Context, guild_id: &GuildId) -> Member {
-    let members: Vec<Member> = guild_id.members(&ctx.http, None, None).await.unwrap();
+use rand::Rng;
 
-    members[(d20::roll_dice(format!("1d{}", members.len()).as_str())
+pub async fn random_user(ctx: &Context, guild_id: &GuildId) -> Member {
+    let member_count = guild_id
+        .to_guild_cached(&ctx.cache)
+        .await
         .unwrap()
-        .total) as usize
-        - 1]
-    .clone()
+        .member_count;
+
+    let members: Vec<Member> = guild_id
+        .members(&ctx.http, Some(member_count), None)
+        .await
+        .unwrap(); //For some reason not supplying a limit makes it return a single member every time
+
+    let mut rng = rand::thread_rng();
+    let random_index = rng.gen_range(0, members.len());
+
+    members[random_index].clone()
 }
 
 pub async fn confirm_admin(ctx: &Context, user: &User, guild: GuildId) -> bool {

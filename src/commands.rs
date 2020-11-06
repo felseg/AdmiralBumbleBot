@@ -1,7 +1,7 @@
 use {
     regex::Regex,
     serenity::{
-        model::{channel::Message, id::EmojiId, channel::ReactionType},
+        model::{channel::Message, channel::ReactionType, id::EmojiId},
         prelude::Context,
     },
 };
