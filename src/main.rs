@@ -26,6 +26,8 @@ async fn main() {
         .await
         .expect("Error creating client");
 
+    client.cache_and_http.cache.set_max_messages(100).await;
+
     if let Err(e) = client.start().await {
         eprintln!("Error starting client: {}", e);
     }
