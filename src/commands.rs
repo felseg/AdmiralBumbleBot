@@ -18,27 +18,8 @@ mod punish;
 mod slap;
 
 pub async fn execute(ctx: &Context, msg: &Message, db: &sled::Db) {
-    if msg.content.to_ascii_lowercase().contains("sonic")
-        || msg.content.to_ascii_lowercase().contains("sanic")
-    {
-        msg.react(
-            &ctx.http,
-            ReactionType::Custom {
-                id: EmojiId(724619044606574645),
-                animated: false,
-                name: Some(String::from("sonic-1")),
-            },
-        )
-        .await
-        .expect("I literally can't even");
-    }
-
-    if msg.content.to_ascii_lowercase() == "ok" {
-        msg.channel_id.say(&ctx.http, 
-            "\"Ok\"? Are you fucking kidding me? I spent a decent portion of my life writing all of that and your response to me is \"Ok\"? Are you so mentally handicapped that the only word you can comprehend is \"Ok\" - or are you just some fucking asshole who thinks that with such a short response, he can make a statement about how meaningless what was written was? Well, I'll have you know that what I wrote was NOT meaningless, in fact, I even had my written work proof-read by several professors of literature. Don't believe me? I doubt you would, and your response to this will probably be \"Ok\" once again. Do I give a fuck? No, does it look like I give even the slightest fuck about two fucking letters? I bet you took the time to type those two letters too, I bet you sat there and chuckled to yourself for 20 hearty seconds before pressing \"send\". You're so fucking pathetic. I'm honestly considering directing you to a psychiatrist, but I'm simply far too nice to do something like that. You, however, will go out of your way to make a fool out of someone by responding to a well-thought-out, intelligent, or humorous statement that probably took longer to write than you can last in bed with a chimpanzee. What do I have to say to you? Absolutely nothing. I couldn't be bothered to respond to such a worthless attempt at a response. Do you want \"Ok\" on your gravestone?"
-        ).await
-        .expect("Error sending message");
-    }
+    sonic(&ctx, &msg).await;
+    copypastas(&ctx, &msg).await;
 
     if !msg.content.starts_with('$') {
         return;
@@ -106,4 +87,34 @@ fn parse_command(text: &str) -> Option<(String, String, String)> {
     }
 
     None
+}
+
+async fn sonic(ctx: &Context, msg: &Message) {
+    if msg.content.to_ascii_lowercase().contains("sonic")
+        || msg.content.to_ascii_lowercase().contains("sanic")
+    {
+        msg.react(
+            &ctx.http,
+            ReactionType::Custom {
+                id: EmojiId(724619044606574645),
+                animated: false,
+                name: Some(String::from("sonic-1")),
+            },
+        )
+        .await
+        .expect("I literally can't even");
+    }
+}
+
+async fn copypastas(ctx: &Context, msg: &Message) {
+    if d20::roll_dice("1d20").unwrap().total > 10 {
+        return;
+    }
+
+    if msg.content.to_ascii_lowercase() == "ok" {
+        msg.channel_id.say(&ctx.http, 
+            "\"Ok\"? Are you fucking kidding me? I spent a decent portion of my life writing all of that and your response to me is \"Ok\"? Are you so mentally handicapped that the only word you can comprehend is \"Ok\" - or are you just some fucking asshole who thinks that with such a short response, he can make a statement about how meaningless what was written was? Well, I'll have you know that what I wrote was NOT meaningless, in fact, I even had my written work proof-read by several professors of literature. Don't believe me? I doubt you would, and your response to this will probably be \"Ok\" once again. Do I give a fuck? No, does it look like I give even the slightest fuck about two fucking letters? I bet you took the time to type those two letters too, I bet you sat there and chuckled to yourself for 20 hearty seconds before pressing \"send\". You're so fucking pathetic. I'm honestly considering directing you to a psychiatrist, but I'm simply far too nice to do something like that. You, however, will go out of your way to make a fool out of someone by responding to a well-thought-out, intelligent, or humorous statement that probably took longer to write than you can last in bed with a chimpanzee. What do I have to say to you? Absolutely nothing. I couldn't be bothered to respond to such a worthless attempt at a response. Do you want \"Ok\" on your gravestone?"
+        ).await
+        .expect("Error sending message");
+    }
 }
