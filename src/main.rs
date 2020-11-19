@@ -11,6 +11,7 @@ mod macros;
 mod commands;
 mod handler;
 mod logging;
+mod pastas;
 mod storage;
 
 const STORAGE_PATH: &str = "storage";
