@@ -183,8 +183,10 @@ async fn consciousness(ctx: &Context, msg: &Message, ignore_list: Arc<RwLock<Has
 
                 return;
             } else {
+                let response = format!("<@{}> HOLY SHIT GO OUTSIDE", user_id);
+                
                 msg.channel_id
-                    .say(&ctx.http, "HOLY SHIT GO OUTSIDE")
+                    .say(&ctx.http, response)
                     .await
                     .expect("Error sending message");
             }
