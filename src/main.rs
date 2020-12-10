@@ -2,10 +2,12 @@
 #![feature(drain_filter)]
 #![feature(str_split_once)]
 
-use handler::Handler;
-
-use dotenv::dotenv;
-use serenity::Client;
+use {
+    dotenv::dotenv,
+    handler::Handler,
+    serenity::{prelude::RwLock, Client},
+    std::{collections::HashMap, sync::Arc},
+};
 
 #[macro_use]
 mod macros;
@@ -17,6 +19,8 @@ mod storage;
 
 const STORAGE_PATH: &str = "storage";
 const CACHE_SIZE: usize = 500;
+const CLEVERBOT_LIMIT: u8 = 5;
+const CLEVERBOT_DELAY_SECONDS: u64 = 300;
 
 #[tokio::main]
 async fn main() {
@@ -25,6 +29,7 @@ async fn main() {
     let mut client = Client::builder(get_env!("ABB_TOKEN"))
         .event_handler(Handler {
             storage: sled::open(STORAGE_PATH).expect("Error opening storage database"),
+            ignore_list: Arc::new(RwLock::new(HashMap::new())),
         })
         .await
         .expect("Error creating client");

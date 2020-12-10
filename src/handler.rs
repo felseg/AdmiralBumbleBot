@@ -12,11 +12,12 @@ use {
         },
         prelude::*,
     },
-    std::time,
+    std::{collections::HashMap, sync::Arc, time},
 };
 
 pub struct Handler {
     pub storage: sled::Db,
+    pub ignore_list: Arc<RwLock<HashMap<u64, u8>>>,
 }
 
 #[async_trait]
@@ -62,7 +63,8 @@ impl EventHandler for Handler {
     }
 
     async fn message(&self, ctx: Context, msg: Message) {
-        commands::execute(&ctx, &msg, &self.storage).await;
+        let arc = self.ignore_list.clone();
+        commands::execute(&ctx, &msg, &self.storage, arc).await;
 
         let user_id = *msg.author.id.as_u64();
         let channel_id = *msg.channel_id.as_u64();
