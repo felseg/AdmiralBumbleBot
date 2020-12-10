@@ -1,3 +1,5 @@
+use super::common;
+
 use {
     crate::storage,
     crate::storage::MessageModel,
@@ -9,6 +11,10 @@ use {
 };
 
 pub async fn get_message_data(ctx: &Context, msg: &Message, target: &str, db: &sled::Db) {
+    if common::in_bot_channel(&msg) {
+        return;
+    }
+
     let user_id: u64 = target.parse().unwrap();
 
     let username = UserId(user_id).to_user(&ctx.http).await.unwrap().name;

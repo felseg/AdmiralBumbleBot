@@ -12,6 +12,7 @@ use {
 #[macro_use]
 mod macros;
 mod commands;
+mod consciousness;
 mod handler;
 mod logging;
 mod pastas;

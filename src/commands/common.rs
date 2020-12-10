@@ -1,5 +1,6 @@
 use serenity::{
     model::{
+        channel::Message,
         guild::Member,
         id::{GuildId, RoleId},
         prelude::User,
@@ -38,4 +39,13 @@ pub async fn confirm_admin(ctx: &Context, user: &User, guild: GuildId) -> bool {
             false
         }
     }
+}
+
+pub fn in_bot_channel(msg: &Message) -> bool {
+    if msg.channel_id.0 == get_env!("ABB_BOT_CHANNEL", u64)
+        || msg.channel_id.0 == get_env!("ABB_BOT_TEST_CHANNEL", u64)
+    {
+        return true;
+    }
+    false
 }
