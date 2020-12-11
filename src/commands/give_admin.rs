@@ -1,9 +1,14 @@
 use {
+    super::common,
     crate::logging,
     serenity::{model::channel::Message, prelude::Context},
 };
 
 pub async fn give_admin(ctx: &Context, msg: &Message) {
+    if !common::in_bot_channel(&msg) {
+        return;
+    }
+    
     let guild_id = msg.guild_id.expect("Error getting guild ID");
     let author = &msg.author;
 
