@@ -10,7 +10,7 @@ pub async fn clean(ctx: &Context, msg: &Message, args: &str) {
 
     match args.parse::<u64>() {
         Ok(limit) => {
-            if common::confirm_admin(&ctx, author, guild_id).await
+            if common::confirm_admin(ctx, author, guild_id).await
                 || d20::roll_dice("2d20").unwrap().total >= 39
             {
                 let channel_id = msg.channel_id;

@@ -26,7 +26,7 @@ pub async fn punish(
     let guild_id = msg.guild_id.expect("Error getting guild ID");
     let author = &msg.author;
 
-    if common::confirm_admin(&ctx, &author, guild_id).await
+    if common::confirm_admin(ctx, author, guild_id).await
         || d20::roll_dice("2d20").unwrap().total >= 39
     {
         match punishment_type {

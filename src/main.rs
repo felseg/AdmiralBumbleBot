@@ -1,6 +1,5 @@
 #![warn(clippy::all, clippy::needless_pass_by_value)]
 #![feature(drain_filter)]
-#![feature(str_split_once)]
 
 use {
     dotenv::dotenv,

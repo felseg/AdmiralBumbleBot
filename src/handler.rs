@@ -68,7 +68,6 @@ impl EventHandler for Handler {
 
         let user_id = *msg.author.id.as_u64();
         let channel_id = *msg.channel_id.as_u64();
-        let words: Vec<&str> = msg.content.split(' ').collect();
         let timestamp = time::SystemTime::now()
             .duration_since(time::UNIX_EPOCH)
             .unwrap()
@@ -77,7 +76,7 @@ impl EventHandler for Handler {
         storage::log_activity(
             user_id,
             channel_id,
-            words.len() as u16,
+            msg.content.split(' ').count() as u16,
             timestamp,
             &self.storage,
         );

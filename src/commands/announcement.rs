@@ -17,9 +17,9 @@ pub async fn announcement(ctx: &Context, msg: &Message) {
         None => return,
     };
 
-    let random_user = common::random_user(&ctx, &guild_id).await;
+    let random_user = common::random_user(ctx, &guild_id).await;
 
-    if common::confirm_admin(&ctx, &author, guild_id).await
+    if common::confirm_admin(ctx, author, guild_id).await
         || d20::roll_dice("2d20").unwrap().total >= 39
     {
         if let Err(e) = ChannelId(get_env!("ABB_ANNOUNCEMENT_CHANNEL", u64))
@@ -44,7 +44,7 @@ pub async fn announcement(ctx: &Context, msg: &Message) {
 fn parse_announcement_message(message: &str) -> Option<(String, String)> {
     let re = Regex::new(r"(\*\*(?P<title>.*)\*\* (?P<body>.*))").unwrap();
 
-    if !re.is_match(&message) {
+    if !re.is_match(message) {
         return None;
     }
 

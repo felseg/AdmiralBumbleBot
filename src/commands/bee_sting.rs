@@ -1,5 +1,4 @@
 use {
-    d20,
     num_derive::FromPrimitive,
     num_traits::FromPrimitive,
     serenity::{model::channel::Message, prelude::Context},
@@ -20,8 +19,8 @@ pub async fn bee_sting(ctx: &Context, msg: &Message, _command: &str, _target: &s
 
     match FromPrimitive::from_u8(roll) {
         Some(Sting::CreateDumbChannel) => create_dumb_channel::create_dumb_channel(ctx, msg).await,
-        Some(Sting::Kick) => kick::kick(&ctx, msg).await,
-        Some(Sting::Mute) => mute::mute(&ctx, msg).await,
+        Some(Sting::Kick) => kick::kick(ctx, msg).await,
+        Some(Sting::Mute) => mute::mute(ctx, msg).await,
         None => {}
     }
 }

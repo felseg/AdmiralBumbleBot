@@ -10,7 +10,7 @@ use {
 };
 
 pub async fn get_message_data(ctx: &Context, msg: &Message, target: &str, db: &sled::Db) {
-    if !common::in_bot_channel(&msg) {
+    if !common::in_bot_channel(msg) {
         return;
     }
 

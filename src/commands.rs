@@ -26,15 +26,17 @@ pub async fn execute(
     db: &sled::Db,
     ignore_list: Arc<RwLock<HashMap<u64, u8>>>,
 ) {
-    sonic(&ctx, &msg).await;
-    pastas::copypastas(&ctx, &msg).await;
-    consciousness::consciousness(&ctx, &msg, ignore_list).await;
+    println!("Hello world!");
+
+    sonic(ctx, msg).await;
+    pastas::copypastas(ctx, msg).await;
+    consciousness::consciousness(ctx, msg, ignore_list).await;
 
     if !msg.content.starts_with('$') {
         return;
     }
 
-    let (command, target, args) = match parse_command(&msg.content.as_str()) {
+    let (command, target, args) = match parse_command(msg.content.as_str()) {
         Some(result) => result,
         None => return,
     };
@@ -42,22 +44,22 @@ pub async fn execute(
     if d20::roll_dice("1d20").unwrap().total == 20
         && *msg.channel_id.as_u64() != get_env!("ABB_BOT_TEST_CHANNEL", u64)
     {
-        bee_sting::bee_sting(ctx, &msg, &command, &target, &args).await;
+        bee_sting::bee_sting(ctx, msg, &command, &target, &args).await;
         return;
     }
 
     match command.as_str() {
-        "$help" => help::help(&ctx, &msg).await,
-        "$buzz" => buzz::buzz(&ctx, &msg).await,
-        "$kick" => punish::punish(ctx, &msg, &target, &args, &punish::Punishment::Kick).await,
-        "$ban" => punish::punish(ctx, &msg, &target, &args, &punish::Punishment::Ban).await,
-        "$mute" => punish::punish(ctx, &msg, &target, &args, &punish::Punishment::Mute).await,
-        "$unmute" => punish::punish(ctx, &msg, &target, &args, &punish::Punishment::Unmute).await,
-        "$announcement" => announcement::announcement(&ctx, &msg).await,
-        "$giveAdmin" => give_admin::give_admin(ctx, &msg).await,
-        "$clean" => clean::clean(ctx, &msg, &args).await,
-        "$getMessageData" => get_message_data::get_message_data(&ctx, &msg, &target, &db).await,
-        "$slap" => slap::slap(&ctx, &msg, &target, &args).await,
+        "$help" => help::help(ctx, msg).await,
+        "$buzz" => buzz::buzz(ctx, msg).await,
+        "$kick" => punish::punish(ctx, msg, &target, &args, &punish::Punishment::Kick).await,
+        "$ban" => punish::punish(ctx, msg, &target, &args, &punish::Punishment::Ban).await,
+        "$mute" => punish::punish(ctx, msg, &target, &args, &punish::Punishment::Mute).await,
+        "$unmute" => punish::punish(ctx, msg, &target, &args, &punish::Punishment::Unmute).await,
+        "$announcement" => announcement::announcement(ctx, msg).await,
+        "$giveAdmin" => give_admin::give_admin(ctx, msg).await,
+        "$clean" => clean::clean(ctx, msg, &args).await,
+        "$getMessageData" => get_message_data::get_message_data(ctx, msg, &target, db).await,
+        "$slap" => slap::slap(ctx, msg, &target, &args).await,
         _ => {}
     };
 }
@@ -73,7 +75,7 @@ fn parse_command(text: &str) -> Option<(String, String, String)> {
     ];
 
     for re in regexes {
-        if re.is_match(&text) {
+        if re.is_match(text) {
             let caps = re.captures(text).unwrap();
 
             let command = match caps.name("command") {

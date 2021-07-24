@@ -1,5 +1,4 @@
 use {
-    d20,
     ron::de::from_reader,
     serenity::{model::channel::Message, prelude::Context},
     std::{collections::HashMap, fs::File},

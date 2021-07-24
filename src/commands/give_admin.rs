@@ -5,7 +5,7 @@ use {
 };
 
 pub async fn give_admin(ctx: &Context, msg: &Message) {
-    if !common::in_bot_channel(&msg) {
+    if !common::in_bot_channel(msg) {
         return;
     }
     
