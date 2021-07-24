@@ -26,8 +26,6 @@ pub async fn execute(
     db: &sled::Db,
     ignore_list: Arc<RwLock<HashMap<u64, u8>>>,
 ) {
-    println!("Hello world!");
-
     sonic(ctx, msg).await;
     pastas::copypastas(ctx, msg).await;
     consciousness::consciousness(ctx, msg, ignore_list).await;
