@@ -4,7 +4,7 @@ macro_rules! get_env {
         std::env::var($name)
             .expect(format!("{} not found", $name).as_str())
             .parse::<$type>()
-            .expect(format!("Error parsing {}", $name).as_str());
+            .expect(format!("Error parsing {}", $name).as_str())
     };
 
     ($name:expr) => {

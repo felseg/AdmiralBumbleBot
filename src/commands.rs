@@ -17,6 +17,7 @@ mod common;
 mod get_message_data;
 mod give_admin;
 mod help;
+mod jenkem;
 mod punish;
 mod slap;
 
@@ -58,6 +59,8 @@ pub async fn execute(
         "$clean" => clean::clean(ctx, msg, &args).await,
         "$getMessageData" => get_message_data::get_message_data(ctx, msg, &target, db).await,
         "$slap" => slap::slap(ctx, msg, &target, &args).await,
+        "$passJenkem" => jenkem::pass_jenkem(ctx, msg, &target, db).await,
+        "$brewJenkem" => jenkem::brew_jenkem(ctx, msg, db).await,
         _ => {}
     };
 }
