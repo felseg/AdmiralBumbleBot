@@ -61,6 +61,9 @@ pub async fn execute(
         "$slap" => slap::slap(ctx, msg, &target, &args).await,
         "$passJenkem" => jenkem::pass_jenkem(ctx, msg, &target, db).await,
         "$brewJenkem" => jenkem::brew_jenkem(ctx, msg, db).await,
+        "$rejectJenkem" => jenkem::reject_jenkem(ctx, msg, db).await,
+        "$locateJenkem" => jenkem::locate_jenkem(ctx, msg, db).await,
+        "$jenkemStreak" => jenkem::jenkem_streak(ctx, msg, db).await,
         _ => {}
     };
 }

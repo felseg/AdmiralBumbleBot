@@ -43,40 +43,85 @@ pub fn pass_jenkem(recipient: u64, db: &sled::Db) -> i32 {
         })
         .expect("Error passing jenkem");
 
-    db.flush().expect("Error flushing storage tree");
-
     let model: JenkemModel = match model {
         Some(bytes) => bincode::deserialize(&bytes).unwrap(),
         None => JenkemModel::new(0),
     };
 
-    model.huff_count
+    model.huff_count()
 }
 
-pub fn init_jenkem(brewer: u64, db: &sled::Db) {
-    db.update_and_fetch("jenkem", |value| {
-        let mut model = match value {
-            Some(bytes) => bincode::deserialize(&bytes).unwrap(),
-            None => JenkemModel::new(0),
-        };
+pub fn reject_jenkem(db: &sled::Db) -> Result<(), ()> {
+    let model = db
+        .fetch_and_update("jenkem", |value| {
+            let mut model = match value {
+                Some(bytes) => bincode::deserialize(&bytes).unwrap(),
+                None => JenkemModel::new(0),
+            };
 
-        model.current_holder = brewer;
-        model.huff_count = 0;
+            if model.current_holder() != 0 && model.previous_holder() != 0 {
+                model.reject();
+            };
 
-        Some(bincode::serialize(&model).expect("Error brewing jenkem"))
-    })
-    .expect("Error brewing jenkem");
+            Some(bincode::serialize(&model).expect("Error rejecting jenkem"))
+        })
+        .expect("Error rejecting jenkem");
 
-    db.flush().expect("Error flushing storage tree");
-}
-
-pub fn get_jenkem_holder(db: &sled::Db) -> u64 {
-    let jenkem = match db.get("jenkem").expect("Error retrieving jenkem") {
+    let model = match model {
         Some(bytes) => bincode::deserialize(&bytes).unwrap(),
         None => JenkemModel::new(0),
     };
 
-    jenkem.current_holder
+    if model.previous_holder() == 0 {
+        Err(())
+    } else {
+        Ok(())
+    }
+}
+
+pub fn locate_jenkem(db: &sled::Db) -> u64 {
+    let model = match db.get("jenkem").expect("Error locating jenkem") {
+        Some(bytes) => bincode::deserialize(&bytes).unwrap(),
+        None => JenkemModel::new(0),
+    };
+
+    model.current_holder()
+}
+
+pub fn init_jenkem(brewer: u64, db: &sled::Db) {
+    db.remove("jenkem").expect("Error deleting jenkem");
+    db.insert(
+        "jenkem",
+        bincode::serialize(&JenkemModel::new(brewer)).expect("Error serializing jenkem"),
+    )
+    .expect("Error inserting jenkem");
+    db.flush().expect("Error flushing storage tree");
+}
+
+pub fn update_jenkem_streak(streak: i32, db: &sled::Db) {
+    db.update_and_fetch("jenkem_streak", |value| {
+        let current_streak = match value {
+            Some(bytes) => bincode::deserialize(&bytes).expect("Error deserializing jenkem streak"),
+            None => 0,
+        };
+
+        if streak > current_streak {
+            Some(bincode::serialize(&streak).expect("Error serializing jenkem streak"))
+        } else {
+            None
+        }
+    })
+    .expect("Error updating jenkem streak");
+}
+
+pub fn get_jenkem_streak(db: &sled::Db) -> i32 {
+    match db
+        .get("jenkem_streak")
+        .expect("Error getting jenkem streak")
+    {
+        Some(bytes) => bincode::deserialize(&bytes).expect("Error deserializing jenkem streak"),
+        None => 0,
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
@@ -113,19 +158,39 @@ impl MessageModel {
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 pub struct JenkemModel {
     current_holder: u64,
+    previous_holder: u64,
     huff_count: i32,
 }
 
 impl JenkemModel {
     pub fn new(current_holder: u64) -> JenkemModel {
         JenkemModel {
-            current_holder: current_holder,
+            current_holder,
+            previous_holder: 0,
             huff_count: 0,
         }
     }
 
     pub fn pass(&mut self, recipient: u64) {
         self.huff_count += 1;
+        self.previous_holder = self.current_holder;
         self.current_holder = recipient;
+    }
+
+    pub fn reject(&mut self) {
+        self.current_holder = self.previous_holder;
+        self.previous_holder = 0;
+    }
+
+    pub fn huff_count(&self) -> i32 {
+        self.huff_count
+    }
+
+    pub fn current_holder(&self) -> u64 {
+        self.current_holder
+    }
+
+    pub fn previous_holder(&self) -> u64 {
+        self.previous_holder
     }
 }

@@ -37,6 +37,3 @@ enum Sting {
     Kick,
     Mute,
 }
-
-#[cfg(test)]
-mod tests {}
