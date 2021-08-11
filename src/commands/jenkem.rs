@@ -1,4 +1,5 @@
 use {
+    crate::commands::bee_sting,
     crate::storage,
     serenity::{
         model::{channel::Message, id::UserId},
@@ -9,8 +10,29 @@ use {
 pub async fn pass_jenkem(ctx: &Context, msg: &Message, target: &str, db: &sled::Db) {
     let author = &msg.author;
     let recipient = UserId(target.parse().expect("Error parsing target"));
+    let wrl_id = get_env!("ABB_WRL_ID", u64);
 
     if jenkem_possession_check(ctx, msg, author.id.0, db).await && author.id.0 != recipient.0 {
+        if recipient.0 == wrl_id {
+            msg.channel_id
+                .say(
+                    &ctx.http,
+                    format!(
+                        "{} is allergic to jenkem!",
+                        UserId(wrl_id)
+                            .to_user(&ctx.http)
+                            .await
+                            .expect("Error getting username")
+                            .name
+                    ),
+                )
+                .await
+                .expect("Error sending message");
+
+            bee_sting::bee_sting(ctx, msg).await;
+            return;
+        }
+
         let huff_count = storage::pass_jenkem(recipient.0, db);
         storage::update_jenkem_streak(huff_count, db);
 

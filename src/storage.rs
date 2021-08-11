@@ -33,7 +33,7 @@ pub fn pass_jenkem(recipient: u64, db: &sled::Db) -> i32 {
     let model = db
         .update_and_fetch("jenkem", |value| {
             let mut model = match value {
-                Some(bytes) => bincode::deserialize(&bytes).unwrap(),
+                Some(bytes) => bincode::deserialize(bytes).unwrap(),
                 None => JenkemModel::new(0),
             };
 
@@ -55,7 +55,7 @@ pub fn reject_jenkem(db: &sled::Db) -> Result<(), ()> {
     let model = db
         .fetch_and_update("jenkem", |value| {
             let mut model = match value {
-                Some(bytes) => bincode::deserialize(&bytes).unwrap(),
+                Some(bytes) => bincode::deserialize(bytes).unwrap(),
                 None => JenkemModel::new(0),
             };
 
@@ -101,14 +101,14 @@ pub fn init_jenkem(brewer: u64, db: &sled::Db) {
 pub fn update_jenkem_streak(streak: i32, db: &sled::Db) {
     db.update_and_fetch("jenkem_streak", |value| {
         let current_streak = match value {
-            Some(bytes) => bincode::deserialize(&bytes).expect("Error deserializing jenkem streak"),
+            Some(bytes) => bincode::deserialize(bytes).expect("Error deserializing jenkem streak"),
             None => 0,
         };
 
         if streak > current_streak {
             Some(bincode::serialize(&streak).expect("Error serializing jenkem streak"))
         } else {
-            None
+            Some(bincode::serialize(&current_streak).expect("Error serializing jenkem streak"))
         }
     })
     .expect("Error updating jenkem streak");

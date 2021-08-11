@@ -43,7 +43,7 @@ pub async fn execute(
     if d20::roll_dice("1d20").unwrap().total == 20
         && *msg.channel_id.as_u64() != get_env!("ABB_BOT_TEST_CHANNEL", u64)
     {
-        bee_sting::bee_sting(ctx, msg, &command, &target, &args).await;
+        bee_sting::bee_sting(ctx, msg).await;
         return;
     }
 
