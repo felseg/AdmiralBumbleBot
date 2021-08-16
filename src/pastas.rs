@@ -16,18 +16,9 @@ pub async fn copypastas(ctx: &Context, msg: &Message) {
         return;
     }
 
-    if msg.content.to_ascii_lowercase() == "ok"
-        && msg.author.id.0 != get_env!("ABB_BOT_USER_ID", u64)
-    {
-        msg.channel_id
-            .say(&ctx.http, OK_PASTA)
-            .await
-            .expect("Error sending message");
-    }
-
     pasta(ctx, msg, "ok", OK_PASTA).await;
     pasta(ctx, msg, "bye", BYE_PASTA).await;
-    pasta(ctx, msg, "🗿", STONE_PASTA).await;
+    pasta(ctx, msg, ":moyai:", STONE_PASTA).await;
     pasta(ctx, msg, "based", BASED_PASTA).await;
 }
 
