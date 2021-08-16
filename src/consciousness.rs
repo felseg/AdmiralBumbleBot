@@ -17,6 +17,13 @@ pub async fn consciousness(
         return;
     }
 
+    //Limit snowdude abuse
+    let (mut delay_seconds, mut message_limit) = (CLEVERBOT_DELAY_SECONDS, CLEVERBOT_LIMIT);
+    if msg.author.id.0 == get_env!("ABB_SNOWDUDE_ID", u64) {
+        delay_seconds = 86400;
+        message_limit = 5;
+    }
+
     if msg
         .content
         .starts_with(&format!("<@!{}>", get_env!("ABB_BOT_USER_ID")))
@@ -38,7 +45,7 @@ pub async fn consciousness(
         }
 
         if let Some(ignore_count) = current_ignore_count {
-            if ignore_count < CLEVERBOT_LIMIT {
+            if ignore_count < message_limit {
                 {
                     let mut write_lock = ignore_list.write().await;
                     write_lock.insert(user_id, current_ignore_count.unwrap());
@@ -47,8 +54,7 @@ pub async fn consciousness(
                 tokio::spawn(async move {
                     let arc = ignore_list.clone();
 
-                    tokio::time::delay_for(std::time::Duration::from_secs(CLEVERBOT_DELAY_SECONDS))
-                        .await;
+                    tokio::time::delay_for(std::time::Duration::from_secs(delay_seconds)).await;
 
                     let mut write_lock = arc.write().await;
                     let current_count = *write_lock.get(&user_id).unwrap();
