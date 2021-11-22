@@ -21,6 +21,7 @@ pub async fn copypastas(ctx: &Context, msg: &Message) {
     pasta(ctx, msg, "bye", BYE_PASTA).await;
     pasta(ctx, msg, "me", SHIRTLESS_PASTA).await;
     pasta(ctx, msg, "based", BASED_PASTA).await;
+    pasta(ctx, msg, "nft", NFT_PASTA).await;
 }
 
 pub async fn pasta(ctx: &Context, msg: &Message, trigger: &str, pasta: &str) {
