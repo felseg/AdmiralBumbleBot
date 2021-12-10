@@ -49,3 +49,16 @@ pub fn in_bot_channel(msg: &Message) -> bool {
     }
     false
 }
+
+pub async fn has_wuss_role(ctx: &Context, user: &User, guild: GuildId) -> bool {
+    match user
+        .has_role(&ctx.http, guild, RoleId(get_env!("ABB_WUSS_ROLE", u64)))
+        .await
+    {
+        Ok(b) => b,
+        Err(e) => {
+            eprintln!("Error checking role status: {}", e);
+            true
+        }
+    }
+}

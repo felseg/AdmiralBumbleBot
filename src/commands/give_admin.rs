@@ -12,6 +12,14 @@ pub async fn give_admin(ctx: &Context, msg: &Message) {
     let guild_id = msg.guild_id.expect("Error getting guild ID");
     let author = &msg.author;
 
+    if common::has_wuss_role(ctx, author, guild_id).await {
+        msg.channel_id
+            .say(&ctx.http, "get fucked nerd")
+            .await
+            .expect("Error sending message");
+        return;
+    }
+
     if *author.id.as_u64() == get_env!("ABB_PORKSAUSAGES_ID", u64)
         || d20::roll_dice("2d20").unwrap().total >= 39
     {
