@@ -19,6 +19,7 @@ mod give_admin;
 mod help;
 mod jenkem;
 mod punish;
+mod roll;
 mod slap;
 
 pub async fn execute(
@@ -64,6 +65,7 @@ pub async fn execute(
         "$rejectJenkem" => jenkem::reject_jenkem(ctx, msg, db).await,
         "$locateJenkem" => jenkem::locate_jenkem(ctx, msg, db).await,
         "$jenkemStreak" => jenkem::jenkem_streak(ctx, msg, db).await,
+        "$roll" => roll::roll(ctx, msg, &args).await,
         _ => {}
     };
 }

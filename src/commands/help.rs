@@ -55,6 +55,11 @@ pub async fn help(ctx: &Context, msg: &Message) {
                     "Slap somebody with an object of your choosing.",
                     true,
                 ),
+                (
+                    "$roll `{dice}`",
+                    "Roll one or more dice with as many sides as you choose, e.g `2d20`",
+                    true,
+                ),
             ]);
                 e
             });
