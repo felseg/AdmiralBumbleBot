@@ -17,7 +17,10 @@ pub async fn give_admin(ctx: &Context, msg: &Message, db: &sled::Db) {
 
     if dice_roll && !has_jenkem {
         msg.channel_id
-            .say(&ctx.http, "Maybe if I had some high quality jenk I'd feel a little more generous...")
+            .say(
+                &ctx.http,
+                "Maybe if I had some high quality jenk I'd feel a little more generous...",
+            )
             .await
             .expect("Failed to send message");
 
@@ -29,7 +32,7 @@ pub async fn give_admin(ctx: &Context, msg: &Message, db: &sled::Db) {
             .say(&ctx.http, "get fucked nerd")
             .await
             .expect("Error sending message");
-            
+
         return;
     }
 
