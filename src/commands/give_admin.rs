@@ -12,7 +12,15 @@ pub async fn give_admin(ctx: &Context, msg: &Message, db: &sled::Db) {
 
     let guild_id = msg.guild_id.expect("Error getting guild ID");
     let author = &msg.author;
-    let has_jenkem = storage::locate_jenkem(db) == author.id.0;
+    let has_jenkem = storage::locate_jenkem(db) == get_env!("ABB_BOT_USER_ID", u64);
+    let dice_roll = d20::roll_dice("2d20").unwrap().total >= 39;
+
+    if dice_roll && !has_jenkem {
+        msg.channel_id
+            .say(&ctx.http, "Maybe if I had some high quality jenk I'd feel a little more generous...")
+            .await
+            .expect("Failed to send message");
+    }
 
     if common::has_wuss_role(ctx, author, guild_id).await {
         msg.channel_id
