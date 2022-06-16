@@ -14,6 +14,8 @@ pub async fn give_admin(ctx: &Context, msg: &Message, db: &sled::Db) {
     let author = &msg.author;
     let has_jenkem = storage::locate_jenkem(db) == get_env!("ABB_BOT_USER_ID", u64);
     let dice_roll = d20::roll_dice("2d20").unwrap().total >= 39;
+    let is_grownup = *author.id.as_u64() == get_env!("ABB_PORKSAUSAGES_ID", u64)
+        || *author.id.as_u64() == get_env!("ABB_WRL_ID", u64);
 
     if dice_roll && !has_jenkem {
         msg.channel_id
@@ -36,9 +38,7 @@ pub async fn give_admin(ctx: &Context, msg: &Message, db: &sled::Db) {
         return;
     }
 
-    if *author.id.as_u64() == get_env!("ABB_PORKSAUSAGES_ID", u64)
-        || (d20::roll_dice("2d20").unwrap().total >= 39 && has_jenkem)
-    {
+    if is_grownup || (dice_roll && has_jenkem) {
         guild_id
             .member(&ctx.http, author.id)
             .await
