@@ -1,16 +1,18 @@
 use {
     super::common,
     crate::logging,
+    crate::storage,
     serenity::{model::channel::Message, prelude::Context},
 };
 
-pub async fn give_admin(ctx: &Context, msg: &Message) {
+pub async fn give_admin(ctx: &Context, msg: &Message, db: &sled::Db) {
     if !common::in_bot_channel(msg) {
         return;
     }
 
     let guild_id = msg.guild_id.expect("Error getting guild ID");
     let author = &msg.author;
+    let has_jenkem = storage::locate_jenkem(db) == author.id.0;
 
     if common::has_wuss_role(ctx, author, guild_id).await {
         msg.channel_id
@@ -21,7 +23,7 @@ pub async fn give_admin(ctx: &Context, msg: &Message) {
     }
 
     if *author.id.as_u64() == get_env!("ABB_PORKSAUSAGES_ID", u64)
-        || d20::roll_dice("2d20").unwrap().total >= 39
+        || (d20::roll_dice("2d20").unwrap().total >= 39 && has_jenkem)
     {
         guild_id
             .member(&ctx.http, author.id)

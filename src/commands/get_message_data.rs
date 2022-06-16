@@ -54,12 +54,15 @@ fn calculate_favourite_channel(data: &[MessageModel]) -> u64 {
     let mut current_channel: u64 = data[0].channel_id();
 
     while !data.is_empty() {
-        stats.insert(
-            current_channel,
-            data.drain_filter(|m| m.channel_id() == current_channel)
-                .map(|_| 1)
-                .sum(),
-        );
+        let count = data
+            .iter()
+            .filter(|m| m.channel_id() == current_channel)
+            .count() as u32;
+
+        data.retain(|m| m.channel_id() != current_channel);
+
+        stats.insert(current_channel, count);
+
         if !data.is_empty() {
             current_channel = data[0].channel_id();
         }

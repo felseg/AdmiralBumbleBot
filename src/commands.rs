@@ -56,7 +56,7 @@ pub async fn execute(
         "$mute" => punish::punish(ctx, msg, &target, &args, &punish::Punishment::Mute).await,
         "$unmute" => punish::punish(ctx, msg, &target, &args, &punish::Punishment::Unmute).await,
         "$announcement" => announcement::announcement(ctx, msg).await,
-        "$giveAdmin" => give_admin::give_admin(ctx, msg).await,
+        "$giveAdmin" => give_admin::give_admin(ctx, msg, db).await,
         "$clean" => clean::clean(ctx, msg, &args).await,
         "$getMessageData" => get_message_data::get_message_data(ctx, msg, &target, db).await,
         "$slap" => slap::slap(ctx, msg, &target, &args).await,
