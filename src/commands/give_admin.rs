@@ -20,6 +20,8 @@ pub async fn give_admin(ctx: &Context, msg: &Message, db: &sled::Db) {
             .say(&ctx.http, "Maybe if I had some high quality jenk I'd feel a little more generous...")
             .await
             .expect("Failed to send message");
+
+        return;
     }
 
     if common::has_wuss_role(ctx, author, guild_id).await {
@@ -27,6 +29,7 @@ pub async fn give_admin(ctx: &Context, msg: &Message, db: &sled::Db) {
             .say(&ctx.http, "get fucked nerd")
             .await
             .expect("Error sending message");
+            
         return;
     }
 
