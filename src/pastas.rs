@@ -7,6 +7,9 @@ const BASED_PASTA: &str = "Based? Based on what? In your dick? Please shut the f
 const NFT_PASTA: &str = "You think it’s funny to take screenshots of people’s NFTs, huh? You must be a very immature person to steal someone’s property that they PAID for. Yeah, I said it. You’re the kind of person who thinks that property theft (a seriously illegal offence) is a joke. I don’t even know why you took that screenshot, because you didn’t pay 1000 dollars for it. I did. The blockchain doesn’t lie. Even if you try to save it, it’s my property. You’re just angry that you couldn’t afford this priceless masterpiece. Even if you could, your fingers couldn’t even click fast enough to get one of the 10000 NFTs sold. You’re just mad you don’t own what I own. So, delete that screenshot, or I swear, you’ll be hearing from my lawyers. /s";
 const JENKEM_PASTA: &str = "every free man deserves the right to choose his own destiny and toil, his own soil and means of dealing with said soil. exactly why I DIYed my own septic tank a few years ago - to stop the Big Shit™☭ fucking commies stealing my rightfully owned, god-given jenkem. in the name of greatest people to have ever trod this earth, i urge you all to toss the gauntlet before the feet of tyranny and dynamite your sewerage line and install your own septic tank system in peaceful protest against the Big Shit™☭ commies i'm glad i hooked my janktank up to my HVAC before winter bc i've been burning the fumes to heat my house, every surface is now coated with a slightly-sticky film which i believe has strong insulative properties, and all my belongings smell like shit and piss (but in a good way). been running my car on jenk and saving the planet from bad emissions and my wallet from gas prices, started a refinery business and been selling my refined jenkem on the foreign market for Big Baller Bucks. also tried fermenting my jenk further to brew craft beers but people said it tasted a bit too shitty, dumb hipster fucks don't know what's good. i guess you can't please everyone... Also started a cryptocurrency and duped a fuckload of dumb investors with my innovative ideas, every time someone flushes their toilet it gets written to the blockchain. this toilet-flush data will be the lifeblood of jenkem futures and derivatives. i've just about finished my pump-and-dump scheme and i'm about to dump all my shitcoins and make a trillion dollars - but not before i take another dump to top up my jenkem supply. this has been a tough 12 months alright, but when life gives you shit, make jenkem.";
 
+const SHUT_VID: &str = "https://cdn.discordapp.com/attachments/987427721732825148/987427794176847963/trim.BB692377-BDB1-4676-B335-C16A02987151.mov";
+const BITWIG_VID: &str = "https://cdn.discordapp.com/attachments/987427721732825148/987427756038053888/trim.66E02CFF-5FD2-4175-AA21-4372AA841015.mov";
+
 pub async fn copypastas(ctx: &Context, msg: &Message) {
     if msg.channel_id.0 == get_env!("ABB_SHITPOST_CHANNEL", u64) {
         return;
@@ -18,12 +21,17 @@ pub async fn copypastas(ctx: &Context, msg: &Message) {
         return;
     }
 
+    //Pastas
     pasta(ctx, msg, "ok", OK_PASTA).await;
     pasta(ctx, msg, "bye", BYE_PASTA).await;
     pasta(ctx, msg, "me", SHIRTLESS_PASTA).await;
     pasta(ctx, msg, "based", BASED_PASTA).await;
     pasta(ctx, msg, "nft", NFT_PASTA).await;
     pasta(ctx, msg, "jenkem", JENKEM_PASTA).await;
+
+    //Image/Video Responses
+    fl_is_fine(ctx, msg).await;
+    bitwig(ctx, msg).await;
 }
 
 pub async fn pasta(ctx: &Context, msg: &Message, trigger: &str, pasta: &str) {
@@ -35,4 +43,30 @@ pub async fn pasta(ctx: &Context, msg: &Message, trigger: &str, pasta: &str) {
             .await
             .expect("Error sending message");
     }
+}
+
+pub async fn response(ctx: &Context, msg: &Message, trigger: &str, response: &str) {
+    if msg.content.to_ascii_lowercase() == trigger.to_ascii_lowercase()
+        && msg.author.id.0 != get_env!("ABB_BOT_USER_ID", u64)
+    {
+        msg.channel_id
+            .say(&ctx.http, format!("<@{}> {}", msg.author.id.as_u64(), response))
+            .await
+            .expect("Error sending message");
+    }
+}
+
+async fn fl_is_fine(ctx: &Context, msg: &Message) {
+    response(ctx, msg, "fl is fine", SHUT_VID).await;
+    response(ctx, msg, "fl studio is fine", SHUT_VID).await;
+    response(ctx, msg, "fl is good", SHUT_VID).await;
+    response(ctx, msg, "fl studio is good", SHUT_VID).await;
+    response(ctx, msg, "there's nothing wrong with fl studio", SHUT_VID).await;
+    response(ctx, msg, "there is nothing wrong with fl studio", SHUT_VID).await;
+    response(ctx, msg, "there's nothing wrong with fl", SHUT_VID).await;
+    response(ctx, msg, "there is nothing wrong with fl", SHUT_VID).await;
+}
+
+async fn bitwig(ctx: &Context, msg: &Message) {
+    response(ctx, msg, "i use bitwig", BITWIG_VID).await;
 }
