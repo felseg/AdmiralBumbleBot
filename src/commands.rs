@@ -1,3 +1,5 @@
+use serenity::model::id::RoleId;
+
 use {
     super::pastas,
     crate::consciousness,
@@ -36,6 +38,23 @@ pub async fn execute(
         return;
     }
 
+    let guild_id = msg.guild_id.expect("Error getting guild ID");
+    let is_booster = match msg
+        .author
+        .has_role(
+            &ctx.http,
+            guild_id,
+            RoleId(get_env!("ABB_BOOSTER_ROLE", u64)),
+        )
+        .await
+    {
+        Ok(b) => b,
+        Err(e) => {
+            eprintln!("Error: {}", e);
+            false
+        }
+    };
+
     let (command, target, args) = match parse_command(msg.content.as_str()) {
         Some(result) => result,
         None => return,
@@ -43,6 +62,7 @@ pub async fn execute(
 
     if d20::roll_dice("1d20").unwrap().total == 20
         && *msg.channel_id.as_u64() != get_env!("ABB_BOT_TEST_CHANNEL", u64)
+        && !is_booster
     {
         bee_sting::bee_sting(ctx, msg).await;
         return;
