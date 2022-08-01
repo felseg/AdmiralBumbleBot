@@ -18,6 +18,7 @@ mod clean;
 mod common;
 mod get_message_data;
 mod give_admin;
+mod health;
 mod help;
 mod jenkem;
 mod punish;
@@ -86,6 +87,7 @@ pub async fn execute(
         "$locateJenkem" => jenkem::locate_jenkem(ctx, msg, db).await,
         "$jenkemStreak" => jenkem::jenkem_streak(ctx, msg, db).await,
         "$roll" => roll::roll(ctx, msg, &args).await,
+        "$beeHealthStatus" => health::health(ctx, msg).await,
         _ => {}
     };
 }

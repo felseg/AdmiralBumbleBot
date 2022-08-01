@@ -50,7 +50,10 @@ pub async fn response(ctx: &Context, msg: &Message, trigger: &str, response: &st
         && msg.author.id.0 != get_env!("ABB_BOT_USER_ID", u64)
     {
         msg.channel_id
-            .say(&ctx.http, format!("<@{}> {}", msg.author.id.as_u64(), response))
+            .say(
+                &ctx.http,
+                format!("<@{}> {}", msg.author.id.as_u64(), response),
+            )
             .await
             .expect("Error sending message");
     }
