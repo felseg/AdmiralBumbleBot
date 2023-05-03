@@ -47,7 +47,7 @@ pub async fn clean(ctx: &Context, msg: &Message, args: &str) {
 
                     log_text.push_str(
                         format!(
-                            "` ┣ <@!{}>: {}`\n",
+                            "` ┣ `<@!{}>`: {}`\n",
                             author.id.as_u64(), stripped_message
                         )
                         .as_str(),
@@ -60,7 +60,7 @@ pub async fn clean(ctx: &Context, msg: &Message, args: &str) {
 
                 log_text.push_str(
                     format!(
-                        "` ┗ <@!{}>: {}`",
+                        "` ┗ `<@!{}>`: {}`",
                         author.id.as_u64(), stripped_message
                     )
                     .as_str(),
