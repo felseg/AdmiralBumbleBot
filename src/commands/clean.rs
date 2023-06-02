@@ -30,7 +30,7 @@ pub async fn clean(ctx: &Context, msg: &Message, args: &str) {
                     .await
                     .expect("Error deleting messages");
 
-                let mut log_text = format!("🧼 {} messages cleaned by <@!{}>!", limit, author.id.0);
+                let mut log_text = format!("🧼 {} messages cleaned by <@!{}>!", limit, author.id.as_u64());
 
                 channel_id
                     .say(&ctx.http, &log_text)
@@ -47,8 +47,8 @@ pub async fn clean(ctx: &Context, msg: &Message, args: &str) {
 
                     log_text.push_str(
                         format!(
-                            "` ┣ {}#{}: {}`\n",
-                            author.name, author.discriminator, stripped_message
+                            "` ┣ `<@!{}>`: {}`\n",
+                            author.id.as_u64(), stripped_message
                         )
                         .as_str(),
                     )
@@ -60,8 +60,8 @@ pub async fn clean(ctx: &Context, msg: &Message, args: &str) {
 
                 log_text.push_str(
                     format!(
-                        "` ┗ {}#{}: {}`",
-                        author.name, author.discriminator, stripped_message
+                        "` ┗ `<@!{}>`: {}`",
+                        author.id.as_u64(), stripped_message
                     )
                     .as_str(),
                 );

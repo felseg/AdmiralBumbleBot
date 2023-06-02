@@ -43,7 +43,7 @@ impl EventHandler for Handler {
 
         logging::log(
             &ctx,
-            format!("📥 User joined: `{}`", new_member.distinct()).as_str(),
+            format!("📥 User joined: <@!{}>", new_member.user.id.as_u64()).as_str(),
         )
         .await;
     }
@@ -57,7 +57,7 @@ impl EventHandler for Handler {
     ) {
         logging::log(
             &ctx,
-            format!("📤 User left: `{}#{}`", user.name, user.discriminator).as_str(),
+            format!("📤 User left: <@!{}>`", user.id.as_u64()).as_str(),
         )
         .await;
     }
@@ -90,8 +90,8 @@ impl EventHandler for Handler {
             logging::log(
                 &ctx,
                 format!(
-                    "🗑 Message deleted in <#{}>: `{}#{}: {}`",
-                    channel_id, message.author.name, message.author.discriminator, stripped_message
+                    "🗑 Message deleted by <@!{}> in <#{}>:\n`{}`",
+                    message.author.id.as_u64(), channel_id, stripped_message
                 )
                 .as_str(),
             )
@@ -119,9 +119,8 @@ impl EventHandler for Handler {
             logging::log(
                 &ctx,
                 format!(
-                    "✏️ Message edited by `{}#{}` in <#{}>:\n` ┣ Original: {}`\n` ┗ Edited:   {}`",
-                    msg.author.name,
-                    msg.author.discriminator,
+                    "✏️ Message edited by <@!{}> in <#{}>:\n` ┣ Original: {}`\n` ┗ Edited:   {}`",
+                    msg.author.id.as_u64(),
                     msg.channel_id,
                     old_stripped,
                     new_stripped
