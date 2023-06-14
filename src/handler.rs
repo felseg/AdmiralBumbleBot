@@ -91,7 +91,9 @@ impl EventHandler for Handler {
                 &ctx,
                 format!(
                     "🗑 Message deleted by <@!{}> in <#{}>:\n`{}`",
-                    message.author.id.as_u64(), channel_id, stripped_message
+                    message.author.id.as_u64(),
+                    channel_id,
+                    stripped_message
                 )
                 .as_str(),
             )

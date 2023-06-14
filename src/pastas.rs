@@ -29,7 +29,7 @@ pub async fn copypastas(ctx: &Context, msg: &Message) {
     pasta(ctx, msg, "based", BASED_PASTA).await;
     pasta(ctx, msg, "nft", NFT_PASTA).await;
     pasta(ctx, msg, "jenkem", JENKEM_PASTA).await;
-    pasta(ctx, msg, "what did he mean by that", WDHM_PASTA).await;    
+    pasta(ctx, msg, "what did he mean by that", WDHM_PASTA).await;
 
     //Image/Video Responses
     fl_is_fine(ctx, msg).await;

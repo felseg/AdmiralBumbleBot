@@ -10,16 +10,18 @@ use {
 pub async fn pass_jenkem(ctx: &Context, msg: &Message, target: &str, db: &sled::Db) {
     let author = &msg.author;
     let recipient = UserId(target.parse().expect("Error parsing target"));
-    let wrl_id = get_env!("ABB_WRL_ID", u64);
+
+    let allergic = vec![get_env!("ABB_CONNER_ID", u64), get_env!("ABB_WRL_ID", u64)];
+    let is_allergic = allergic.contains(&recipient.0);
 
     if jenkem_possession_check(ctx, msg, author.id.0, db).await && author.id.0 != recipient.0 {
-        if recipient.0 == wrl_id {
+        if is_allergic {
             msg.channel_id
                 .say(
                     &ctx.http,
                     format!(
                         "{} is allergic to jenkem!",
-                        UserId(wrl_id)
+                        recipient
                             .to_user(&ctx.http)
                             .await
                             .expect("Error getting username")
