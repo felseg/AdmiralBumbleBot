@@ -10,6 +10,7 @@ const WDHM_PASTA: &str = "Surge";
 
 const SHUT_VID: &str = "https://cdn.discordapp.com/attachments/987427721732825148/987427794176847963/trim.BB692377-BDB1-4676-B335-C16A02987151.mov";
 const BITWIG_VID: &str = "https://cdn.discordapp.com/attachments/987427721732825148/987427756038053888/trim.66E02CFF-5FD2-4175-AA21-4372AA841015.mov";
+const SENNHEISER_VID: &str = "https://cdn.discordapp.com/attachments/784498744506580992/1224166761692397660/Snapsave.app_434596257_1501537313768606_3029272559969168436_n.mp4";
 
 pub async fn copypastas(ctx: &Context, msg: &Message) {
     if msg.channel_id.0 == get_env!("ABB_SHITPOST_CHANNEL", u64) {
@@ -34,6 +35,7 @@ pub async fn copypastas(ctx: &Context, msg: &Message) {
     //Image/Video Responses
     fl_is_fine(ctx, msg).await;
     bitwig(ctx, msg).await;
+    sennheiser(ctx, msg).await;
 }
 
 pub async fn pasta(ctx: &Context, msg: &Message, trigger: &str, pasta: &str) {
@@ -74,4 +76,8 @@ async fn fl_is_fine(ctx: &Context, msg: &Message) {
 
 async fn bitwig(ctx: &Context, msg: &Message) {
     response(ctx, msg, "i use bitwig", BITWIG_VID).await;
+}
+
+async fn sennheiser(ctx: &Context, msg: &Message) {
+    response(ctx, msg, "sennheiser", SENNHEISER_VID).await;
 }
